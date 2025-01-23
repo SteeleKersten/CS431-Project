@@ -1,0 +1,36 @@
+diff --git a/Arduino/System/PackagePathIndex.cmake b/Arduino/System/PackagePathIndex.cmake
+index 65c57bc..11231e5 100644
+--- a/Arduino/System/PackagePathIndex.cmake
++++ b/Arduino/System/PackagePathIndex.cmake
+@@ -119,16 +119,15 @@ function(InitializeArduinoPackagePathList)
+ 	elseif(ARDUINO_INSTALL_PATH AND NOT "${ARDUINO_ENABLE_PACKAGE_MANAGER}"
+ 		AND "${ARDUINO_BOARD_MANAGER_URL}" STREQUAL "")
+ 		if (EXISTS "${ARDUINO_INSTALL_PATH}/lib/version.txt")
+-			message("${ARDUINO_INSTALL_PATH}")
+ 			file(READ "${ARDUINO_INSTALL_PATH}/lib/version.txt" _version)
+ 			string(REGEX MATCH "[0-9]+\\.[0-9]" _ard_version "${_version}")
+-			message("${_ard_version}")
++			message(STATUS "Found Arduino ${_ard_version}: ${ARDUINO_INSTALL_PATH}")
+ 			if (_version AND "${_ard_version}" VERSION_LESS "1.5")
+ 				message(WARNING "${ARDUINO_INSTALL_PATH} may be unsupported version "
+ 					"${_version}. Please install newer version!")
+ 			endif()
+ 		elseif(EXISTS "${ARDUINO_INSTALL_PATH}/inventory.yaml")
+-			message("arduino-cli found at ${ARDUINO_INSTALL_PATH}")
++			message(STATUS "Found Arduino CLI: ${ARDUINO_INSTALL_PATH}")
+ 		endif()
+ 	endif()
+ 
+diff --git a/Arduino/System/PackageIndex.cmake b/Arduino/System/PackageIndex.cmake
+index 47b35bc..eae329d 100644
+--- a/Arduino/System/PackageIndex.cmake
++++ b/Arduino/System/PackageIndex.cmake
+@@ -64,7 +64,7 @@ function(IndexArduinoPackages)
+ 
+ 	foreach(json_file IN LISTS json_files_list)
+ 
+-		message(STATUS "Found Arduino package ${json_file}")
++		message(STATUS "Found Arduino Package: ${json_file}")
+ 		file(READ "${json_file}" json_content)
+ 		math(EXPR json_count "${json_count} + 1")
+ 		set(json_namespace "${namespace}/ard_pkg.${json_count}")

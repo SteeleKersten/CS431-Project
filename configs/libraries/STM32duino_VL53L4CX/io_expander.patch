@@ -1,0 +1,124 @@
+--- vl53l4cx_class.h
++++ vl53l4cx_class.h
+@@ -37,6 +37,7 @@
+ #include "vl53l4cx_tuning_parm_defaults.h"
+ #include "vl53l4cx_xtalk_private_structs.h"
+ #include "Wire.h"
++#include "MCP23018.h"
+ 
+ #define VL53L4CX_DEFAULT_DEVICE_ADDRESS           0x52
+ 
+@@ -67,7 +68,7 @@
+      * @param[in] i2c device I2C to be used for communication
+      * @param[in] xshut_pin shutdown pin to be used as component XSHUT
+      */
+-    VL53L4CX(TwoWire *i2c, int xshut_pin) : dev_i2c(i2c), xshut(xshut_pin)
++    VL53L4CX(TwoWire *i2c, int xshut, MCP23018 *expander) : dev_i2c(i2c), xshut_(xshut), expander_(expander)
+     {
+       Dev = &MyDevice;
+       memset((void *)Dev, 0x0, sizeof(VL53L4CX_Dev_t));
+@@ -75,16 +76,13 @@
+       MyDevice.I2cDevAddr = VL53L4CX_DEFAULT_DEVICE_ADDRESS ;
+     }
+ 
+-    /** Constructor
+-     * No parameters
+-     * Functions to set the Twowire I2c device and XShut pin
+-     * should be executed before begin();
+-     */
+-    VL53L4CX() : dev_i2c(), xshut()
+-    {
+-      Dev = &MyDevice;
+-      memset((void *)Dev, 0x0, sizeof(VL53L4CX_Dev_t));
+-      MyDevice.I2cDevAddr = VL53L4CX_DEFAULT_DEVICE_ADDRESS ;
++    void set_shutdown(bool state) {
++        if (xshut_ > 7) {
++            expander_->SetBPin(xshut_ - 8, state);
++        } else {
++            expander_->SetAPin(xshut_, state);
++        }
++        delay(2);
+     }
+ 
+     /** Destructor
+@@ -95,18 +93,12 @@
+ 
+     virtual int begin()
+     {
+-      if (xshut >= 0) {
+-        pinMode(xshut, OUTPUT);
+-        digitalWrite(xshut, LOW);
+-      }
++      set_shutdown(LOW);
+       return 0;
+     }
+ 
+     virtual int end()
+     {
+-      if (xshut >= 0) {
+-        pinMode(xshut, INPUT);
+-      }
+       return 0;
+     }
+ 
+@@ -139,7 +131,7 @@
+      */
+     void setXShutPin(int xshut_pin)
+     {
+-      xshut = xshut_pin;
++      xshut_ = xshut_pin;
+     }
+ 
+     /**
+@@ -149,9 +141,7 @@
+     /* turns on the sensor */
+     virtual void VL53L4CX_On(void)
+     {
+-      if (xshut >= 0) {
+-        digitalWrite(xshut, HIGH);
+-      }
++      set_shutdown(HIGH);
+       delay(10);
+     }
+ 
+@@ -162,9 +152,7 @@
+     /* turns off the sensor */
+     virtual void VL53L4CX_Off(void)
+     {
+-      if (xshut >= 0) {
+-        digitalWrite(xshut, LOW);
+-      }
++      set_shutdown(LOW);
+       delay(10);
+     }
+ 
+@@ -194,6 +182,15 @@
+     /* vl53lx_api.h functions */
+ 
+     /**
++     * @brief Return the VL53L4CX Sensor Id (Model Id & Model Type)
++     *
++     * @param   pId                   Pointer to the device Model Id
++     * @return  VL53L4CX_ERROR_NONE     Success
++     * @return  "Other error code"    See ::VL53L4CX_Error
++     */
++    VL53L4CX_Error VL53L4CX_GetSensorId(uint16_t *pId);
++
++    /**
+      * @brief Return the VL53L4CX driver Version
+      *
+      * @note This function doesn't access to the device
+@@ -3462,11 +3459,11 @@
+ 
+     /* IO Device */
+     TwoWire *dev_i2c;
+-    /* Digital out pin */
+-    int xshut;
+     /* Device data */
+     VL53L4CX_Dev_t MyDevice;
+     VL53L4CX_DEV Dev;
++    int xshut_;
++    MCP23018 *expander_;
+ };
+ 
+ #endif /* _VL53L4CX_CLASS_H_ */

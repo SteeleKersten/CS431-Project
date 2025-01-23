@@ -1,0 +1,101 @@
+--- MCP23018.cpp
++++ MCP23018.cpp
+@@ -21,7 +21,7 @@
+ 		return -ret;
+ 	}
+ 
+-	return readFromRegister(addr);
++	return 0;
+ }
+ 
+ int MCP23018::writePairToRegister(uint8_t addr, uint8_t first_data, uint8_t second_data) {
+@@ -34,7 +34,7 @@
+ 		return -ret;
+ 	}
+ 	
+-	return readFromRegister(addr);
++	return 0;
+ }
+ 
+ int MCP23018::readPairFromRegister(uint8_t addr) {
+@@ -42,7 +42,7 @@
+ 
+ 	Wire.beginTransmission(i2c_address);
+ 	Wire.write(addr);
+-	int ret = Wire.endTransmission();
++	int ret = Wire.endTransmission(false);
+ 	if (ret != 0) {
+ 		return -ret;
+ 	}
+@@ -51,10 +51,8 @@
+ 	Wire.requestFrom(i2c_address, (uint8_t) 2);
+ 
+ 	// Fill variables when ready
+-	if(Wire.available()) {
+-		reg_a = Wire.read();
+-		reg_b = Wire.read();
+-	}
++	reg_a = Wire.read();
++	reg_b = Wire.read();
+ 
+ 	return reg_a | (reg_b << 8);
+ }
+@@ -65,7 +63,7 @@
+ 	// Establish connection, select receipt addr
+ 	Wire.beginTransmission(i2c_address);
+ 	Wire.write(addr);
+-	int ret = Wire.endTransmission();
++	int ret = Wire.endTransmission(false);
+ 	if (ret != 0) {
+ 		return -ret;
+ 	}
+@@ -74,30 +72,41 @@
+ 	Wire.requestFrom(i2c_address, (uint8_t) 1);
+ 	
+ 	// Fill variables when ready
+-	if(Wire.available()) {
+-		received_data = Wire.read();
+-	}
++	received_data = Wire.read();
+ 	
+ 	return received_data;
+ }
+ 
+ int MCP23018::setMaskInRegister(uint8_t addr, uint8_t mask, bool state) {
+ 	uint8_t temp;
+-	const uint8_t prev = readFromRegister(addr);
+-	const uint8_t res = state ? (prev | mask) : (prev & ~mask);
++	const int prev = readFromRegister(addr);
++	if (prev < 0) {
++		return prev;
++	}
++	const uint8_t prev_port = prev;
++	const uint8_t res = state ? (prev_port | mask) : (prev_port & ~mask);
+ 	return writeToRegister(addr, res);
+ }
+ 
+ int MCP23018::setBitInRegister(uint8_t addr, uint8_t bit, bool state) {
+ 	uint8_t temp;
+-	const uint8_t prev = readFromRegister(addr);
++	const int prev = readFromRegister(addr);
++	if (prev < 0) {
++		return prev;
++	}
++	const uint8_t prev_port = prev;
+ 	const uint8_t bit_mask = 1 << bit;
+-	const uint8_t res = state ? (prev | bit_mask) : (prev & ~bit_mask);
++	const uint8_t res = state ? (prev_port | bit_mask) : (prev_port & ~bit_mask);
+ 	return writeToRegister(addr, res);
+ }
+ 
+ int MCP23018::setBitGroupInRegister(const uint8_t addr, const uint8_t data, const uint8_t mask) {
+-	int temp = readFromRegister(addr) & ( mask ^ 0xff) | ( data & mask );
++	const int prev = readFromRegister(addr);
++	if (prev < 0) {
++		return prev;
++	}
++	const uint8_t prev_port = prev;
++	int temp = prev_port & ( mask ^ 0xff) | ( data & mask );
+ 	if (temp < 0) {
+ 		return temp;
+ 	}

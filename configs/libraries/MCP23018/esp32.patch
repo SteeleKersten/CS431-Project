@@ -1,0 +1,537 @@
+--- MCP23018.h
++++ MCP23018.h
+@@ -1,12 +1,44 @@
+ /*
+- Copyright (C) 2011 James Coliz, Jr. <maniacbug@ymail.com>
++  Copyright (C) 2011 James Coliz, Jr. <maniacbug@ymail.com>
+  
+- This program is free software; you can redistribute it and/or
+- modify it under the terms of the GNU General Public License
+- version 2 as published by the Free Software Foundation.
+- */
+-
+-#include <WProgram.h>
++  This program is free software; you can redistribute it and/or
++  modify it under the terms of the GNU General Public License
++  version 2 as published by the Free Software Foundation.
++*/
++#pragma once
++
++#include <Wire.h>
++
++// MCP23018 registers
++
++#define IODIRA 0x0
++#define IODIRB 0x1
++#define IPOLA 0x2
++#define IPOLB 0x3
++#define INTENA 0x4
++#define INTENB 0x5
++#define DEFVALA 0x6
++#define DEFVALB 0x7
++#define INTCONA 0x8
++#define INTCONB 0x9
++#define IOCON 0x0A
++#define GPPUA 0x0C
++#define GPPUB 0x0D
++#define INTFA 0x0E
++#define INTFB 0x0F
++#define INTCAPA 0x10
++#define INTCAPB 0x11
++#define GPIOA 0x12
++#define GPIOB 0x13
++#define OLATA 0x14
++#define OLATB 0x15
++
++#define IOCON_BANK 0x80
++#define IOCON_MIRROR 0x40
++#define IOCON_SEQOP 0x20
++#define IOCON_ODR 0x04
++#define IOCON_INTPOL 0x02
++#define IOCON_INTCC 0x01
+ 
+ /**
+  * Driver for Microchip MCP23018 Port Extender
+@@ -34,45 +66,6 @@
+ 	/**@{*/
+ 
+ 	/**
+-	 * Write an entire control register
+-	 *
+-	 * @param address The address of the particular register
+-	 * @param data The data to write into the particular register
+-	 */
+-	void writeToRegister(uint8_t address, uint8_t data);
+-
+-	/**
+-	 * Write twice to a control register
+-	 *
+-	 * I think this is only useful for the GPIOA/B registers, which automatically
+-	 * toggle between themselves after writing one.
+-	 *
+-	 * @param address The address of the particular register
+-	 * @param first The first byte to write into the particular register
+-	 * @param second The second byte to write into the particular register
+-	 */
+-	void writePairToRegister(uint8_t address, uint8_t first, uint8_t second);
+-
+-	/**
+-	 * Read an entire control register
+-	 *
+-	 * @param address The address of the particular register
+-	 * @return The data read from the particular register
+-	 */
+-	uint8_t readFromRegister(uint8_t address);
+-
+-	/**
+-	 * Set a single bit in a register
+-	 *
+-	 * This loads all the values from the device first, sets the correct bit
+-	 * an pushes them back.
+-	 *
+-	 * @param address_bit The address and bit number (0-7)
+-	 * @param bitState Whether to set the bit (true) or clear it (false)
+-	 */
+-	void setBitInRegister(const uint8_t address_bit[], bool bitState);
+-
+-	/**
+ 	 * Set a single bit in a register
+ 	 *
+ 	 * This loads all the values from the device first, sets the correct bit
+@@ -85,7 +78,7 @@
+ 	 * @param data The data that should be set into the bits
+ 	 * @param mask 1's for all bits that should be set.
+ 	 */
+-	void setBitGroupInRegister(const uint8_t address, const uint8_t data, const uint8_t mask);
++	int setBitGroupInRegister(const uint8_t address, const uint8_t data, const uint8_t mask);
+ 	/**@}*/
+ 
+ public:
+@@ -106,9 +99,51 @@
+ 	 * @warning This currently sets both ports to be outputs, which is
+ 	 * not very general-purpose.
+ 	 */
+-	void begin(void);
++	int begin();
++
++	/**
++	 * Write twice to a control register
++	 *
++	 * I think this is only useful for the GPIOA/B registers, which automatically
++	 * toggle between themselves after writing one.
++	 *
++	 * @param address The address of the particular register
++	 * @param first The first byte to write into the particular register
++	 * @param second The second byte to write into the particular register
++	 */
++	int writePairToRegister(uint8_t address, uint8_t first, uint8_t second);
++
++	/**
++	 * Read an entire control register
++	 *
++	 * @param address The address of the particular register
++	 * @return The data read from the particular register
++	 */
++	int readFromRegister(uint8_t address);
++	int readPairFromRegister(uint8_t address);
++
++	/**
++	 * Write an entire control register
++	 *
++	 * @param address The address of the particular register
++	 * @param data The data to write into the particular register
++	 */
++	int writeToRegister(uint8_t address, uint8_t data);
+ 
+ 	/**
++	 * Set a single bit in a register
++	 *
++	 * This loads all the values from the device first, sets the correct bit
++	 * an pushes them back.
++	 *
++	 * @param address_bit The address and bit number (0-7)
++	 * @param bitState Whether to set the bit (true) or clear it (false)
++	 */
++	int setBitInRegister(uint8_t addr, uint8_t bit, bool state);
++	int setMaskInRegister(uint8_t addr, uint8_t mask, bool state);
++
++	int SetDirections(uint8_t _a, uint8_t _b);
++	/**
+ 	 * Set the pull-up resistors
+ 	 *
+ 	 * The MCP23018 has open-drain inputs, which means if you want to use the
+@@ -120,21 +155,21 @@
+ 	 * @param _b One bit for each line on port 'B', send 1 to enable the pullup, 
+ 	 * 0 to disable
+ 	 */	
+-	void SetPullups(uint8_t _a, uint8_t _b);
++	int SetPullups(uint8_t _a, uint8_t _b);
+ 
+ 	/**
+ 	 * Set the outputs on Port A
+ 	 *
+ 	 * @param _data Bits to set
+ 	 */	 
+-	void SetPortA(uint8_t _data);
++	int SetPortA(uint8_t _data);
+ 	
+ 	/**
+ 	 * Set the outputs on Port B
+ 	 *
+ 	 * @param _data Bits to set
+ 	 */	 
+-	void SetPortB(uint8_t _data);
++	int SetPortB(uint8_t _data);
+ 
+ 	/**
+ 	 * Set the outputs on both ports in a single call
+@@ -142,14 +177,14 @@
+ 	 * @param _a Bits to set on Port A
+ 	 * @param _b Bits to set on Port B
+ 	 */	 
+-	void SetPorts(uint8_t _a, uint8_t _b);
++	int SetPorts(uint8_t _a, uint8_t _b);
+ 	
+ 	/**
+ 	 * Get the input values on Port A
+ 	 *
+ 	 * @return The bits set on Port A inputs 
+ 	 */	 
+-	uint8_t GetPortA(void);
++	int GetPortA();
+ 	
+ 	/**
+ 	 * Get the input values on Port B
+@@ -157,7 +192,7 @@
+ 	 * @sa GetPortA
+ 	 * @return The bits set on Port B inputs 
+ 	 */	 
+-	uint8_t GetPortB(void);
++	int GetPortB();
+ 	
+ 	/**
+ 	 * Get the output latches on Port A
+@@ -168,7 +203,7 @@
+ 	 * 
+ 	 * @return The bits set on Port A 
+ 	 */	 
+-	uint8_t GetLatchPortA(void);
++	int GetLatchPortA();
+ 	
+ 	/**
+ 	 * Get the output latches on Port B
+@@ -176,18 +211,10 @@
+ 	 * @sa GetLatchPortA 
+ 	 * @return The bits set on Port B 
+ 	 */
+-	uint8_t GetLatchPortB(void);
++	int GetLatchPortB();
+ 	
+-	/**
+-	 * Set only certain bits on Port B
+-	 *
+-	 * For example, to set the lowest 4 bits of this port to B1001, send
+-	 * @a _data as B00001001 and @a _mask as B00001111.
+-	 *
+-	 * @param _data The data to set
+-	 * @param _mask Which bits to set
+-	 */
+-	void SetPortB_bits(uint8_t _data, uint8_t _mask);
++	int SetAPin(uint8_t pin, bool state);
++	int SetBPin(uint8_t pin, bool state);
+ };
+ 
+ /**
+
+--- MCP23018.cpp
++++ MCP23018.cpp
+@@ -1,186 +1,160 @@
+ /*
+- Copyright (C) 2011 James Coliz, Jr. <maniacbug@ymail.com>
++  Copyright (C) 2011 James Coliz, Jr. <maniacbug@ymail.com>
+  
+- This program is free software; you can redistribute it and/or
+- modify it under the terms of the GNU General Public License
+- version 2 as published by the Free Software Foundation.
+- */
++  This program is free software; you can redistribute it and/or
++  modify it under the terms of the GNU General Public License
++  version 2 as published by the Free Software Foundation.
++*/
+ 
++/* #include <Arduino.h> */
+ #include <Wire.h>
+ #include "MCP23018.h"
+ 
+-#undef DEBUG
++#define I2C_MCP23018 0x20
+ 
+-// MCP23018 address on I2C bus
+-
+-const uint8_t I2C_MCP23018 = B0100000;
+-
+-// MCP23018 registers
++int MCP23018::writeToRegister(uint8_t addr, uint8_t data) {
++	Wire.beginTransmission(i2c_address);
++	Wire.write(addr);
++	Wire.write(data);
++	int ret = Wire.endTransmission();
++	if (ret != 0) {
++		return -ret;
++	}
+ 
+-const uint8_t IODIRA = 0x0;
+-const uint8_t IODIRB = 0x1;
+-const uint8_t IOCON = 0xA;
+-const uint8_t IOCON_SEQOP[] = { IOCON, 5 };
+-const uint8_t GPPUA = 0x0C;
+-const uint8_t GPPUB = 0x0D;
+-const uint8_t GPIOA = 0x12;
+-const uint8_t GPIOB = 0x13;
+-const uint8_t OLATA = 0x14;
+-const uint8_t OLATB = 0x15;
++	return readFromRegister(addr);
++}
+ 
+-void MCP23018::writeToRegister(uint8_t address, uint8_t data)
+-{
++int MCP23018::writePairToRegister(uint8_t addr, uint8_t first_data, uint8_t second_data) {
+ 	Wire.beginTransmission(i2c_address);
+-	Wire.send(address);
+-	Wire.send(data);
+-	Wire.endTransmission();
+-
+-#ifdef DEBUG
+-	Serial.print(">");
+-	Serial.print(address,HEX);
+-	Serial.print(">");
+-	Serial.println(data,HEX);
+-#endif
++	Wire.write(addr);
++	Wire.write(first_data);
++	Wire.write(second_data);
++	int ret = Wire.endTransmission();
++	if (ret != 0) {
++		return -ret;
++	}
+ 	
+-	readFromRegister(address);
++	return readFromRegister(addr);
+ }
+ 
+-void MCP23018::writePairToRegister(uint8_t address, uint8_t first_data, uint8_t second_data)
+-{
++int MCP23018::readPairFromRegister(uint8_t addr) {
++	uint8_t reg_a, reg_b;
++
+ 	Wire.beginTransmission(i2c_address);
+-	Wire.send(address);
+-	Wire.send(first_data);
+-	Wire.send(second_data);
+-	Wire.endTransmission();
+-	
+-#ifdef DEBUG
+-	Serial.print(">");
+-	Serial.print(address,HEX);
+-	Serial.print(">");
+-	Serial.println(data,HEX);
+-#endif
++	Wire.write(addr);
++	int ret = Wire.endTransmission();
++	if (ret != 0) {
++		return -ret;
++	}
+ 	
+-	readFromRegister(address);
++	// Request one data byte
++	Wire.requestFrom(i2c_address, (uint8_t) 2);
++
++	// Fill variables when ready
++	if(Wire.available()) {
++		reg_a = Wire.read();
++		reg_b = Wire.read();
++	}
++
++	return reg_a | (reg_b << 8);
+ }
+ 
+-uint8_t MCP23018::readFromRegister(uint8_t address)
+-{
++int MCP23018::readFromRegister(uint8_t addr) {
+ 	uint8_t received_data = 0;
+ 	
+-	// Establish connection, select receipt address
++	// Establish connection, select receipt addr
+ 	Wire.beginTransmission(i2c_address);
+-	Wire.send(address);
+-	Wire.endTransmission();
++	Wire.write(addr);
++	int ret = Wire.endTransmission();
++	if (ret != 0) {
++		return -ret;
++	}
+ 	
+ 	// Request one data byte
+-	Wire.requestFrom(i2c_address, (uint8_t)1);
+-	
+-#ifdef DEBUG
+-	Serial.print("<");
+-	Serial.print(address,HEX);
+-	Serial.print("<");
+-#endif
++	Wire.requestFrom(i2c_address, (uint8_t) 1);
+ 	
+ 	// Fill variables when ready
+-	if(Wire.available())
+-	{
+-		received_data = Wire.receive();
+-#ifdef DEBUG
+-		Serial.println(received_data ,HEX);
+-#endif
+-}
+-	
+-#ifdef DEBUG
+-	else
+-	  Serial.println("?");
+-#endif
++	if(Wire.available()) {
++		received_data = Wire.read();
++	}
+ 	
+ 	return received_data;
+ }
+ 
+-void MCP23018::setBitInRegister(const uint8_t address_bit[], bool bitState)
+-{
++int MCP23018::setMaskInRegister(uint8_t addr, uint8_t mask, bool state) {
+ 	uint8_t temp;
+-	uint8_t address = address_bit[0];
+-	uint8_t bit = address_bit[1];
++	const uint8_t prev = readFromRegister(addr);
++	const uint8_t res = state ? (prev | mask) : (prev & ~mask);
++	return writeToRegister(addr, res);
++}
+ 
+-	// Use bitState to decide which masking to use (to 1 or to 0)
+-	if(bitState)
+-		temp = readFromRegister(address) | (1 << bit);
+-	else
+-		temp = readFromRegister(address) & ~(1 << bit);
+-	
+-	writeToRegister(address, temp);
++int MCP23018::setBitInRegister(uint8_t addr, uint8_t bit, bool state) {
++	uint8_t temp;
++	const uint8_t prev = readFromRegister(addr);
++	const uint8_t bit_mask = 1 << bit;
++	const uint8_t res = state ? (prev | bit_mask) : (prev & ~bit_mask);
++	return writeToRegister(addr, res);
+ }
+ 
+-void MCP23018::setBitGroupInRegister(const uint8_t address, const uint8_t data, const uint8_t mask)
+-{
+-#ifdef DEBUG
+-    Serial.print("()setBitGroupInRegister(");
+-    Serial.print(address,HEX);
+-    Serial.print(",");
+-    Serial.print(data,HEX);
+-    Serial.print(",");
+-    Serial.print(mask,HEX);
+-    Serial.println(")");
+-#endif
+-	
+-	uint8_t temp = readFromRegister(address) & ( mask ^ 0xff) | ( data & mask );	
+-	writeToRegister(address, temp);
++int MCP23018::setBitGroupInRegister(const uint8_t addr, const uint8_t data, const uint8_t mask) {
++	int temp = readFromRegister(addr) & ( mask ^ 0xff) | ( data & mask );
++	if (temp < 0) {
++		return temp;
++	}
++	return writeToRegister(addr, temp);
+ }
+ 
+-MCP23018::MCP23018(uint8_t _address)
+-{
+-	i2c_address = ( _address & B111 ) | I2C_MCP23018;
++MCP23018::MCP23018(uint8_t _address) {
++	i2c_address = ( _address & 0x07 ) | I2C_MCP23018;
+ }
+ 
+-void MCP23018::begin(void)
+-{
+-	// Set all pins to outputs
+-	writePairToRegister(IODIRA,0,0);
++int MCP23018::begin() {
++	Wire.beginTransmission(i2c_address);
++	return -Wire.endTransmission();
+ }
+ 
+-void MCP23018::SetPullups(uint8_t _a, uint8_t _b)
+-{
+-	writePairToRegister(GPPUA,_a,_b);  
++int MCP23018::SetDirections(uint8_t _a, uint8_t _b) {
++	return writePairToRegister(IODIRA,_a,_b);
+ }
+ 
+-void MCP23018::SetPortA(uint8_t _data)
+-{
+-	writeToRegister(GPIOA,_data);
++int MCP23018::SetPullups(uint8_t _a, uint8_t _b) {
++	return writePairToRegister(GPPUA,_a,_b);
+ }
+ 
+-void MCP23018::SetPortB(uint8_t _data)
+-{
+-	writeToRegister(GPIOB,_data);
++int MCP23018::SetPortA(uint8_t _data) {
++	return writeToRegister(GPIOA,_data);
+ }
+ 
+-void MCP23018::SetPorts(uint8_t _a, uint8_t _b)
+-{
+-	writePairToRegister(GPIOA,_a,_b);
++int MCP23018::SetPortB(uint8_t _data) {
++	return writeToRegister(GPIOB,_data);
+ }
+ 
+-uint8_t MCP23018::GetPortA(void)
+-{
++int MCP23018::SetPorts(uint8_t _a, uint8_t _b) {
++	return writePairToRegister(GPIOA,_a,_b);
++}
++
++int MCP23018::GetPortA() {
+ 	return readFromRegister(GPIOA);
+ }
+ 
+-uint8_t MCP23018::GetPortB(void)
+-{
++int MCP23018::GetPortB() {
+ 	return readFromRegister(GPIOB);
+ }
+ 
+-uint8_t MCP23018::GetLatchPortA(void)
+-{
++int MCP23018::GetLatchPortA() {
+ 	return readFromRegister(OLATA);
+ }
+ 
+-uint8_t MCP23018::GetLatchPortB(void)
+-{
++int MCP23018::GetLatchPortB() {
+ 	return readFromRegister(OLATB);
+ }
+ 
+-void MCP23018::SetPortB_bits(uint8_t _data, uint8_t _mask)
+-{
+-	setBitGroupInRegister(OLATB,_data,_mask);
+-}
+\ No newline at end of file
++int MCP23018::SetAPin(uint8_t pin, bool state) {
++	/* Serial.println("a " + String(pin) + " " + String(state)); */
++	return setBitInRegister(OLATA, pin, state);
++}
++
++int MCP23018::SetBPin(uint8_t pin, bool state) {
++	/* Serial.println("b " + String(pin) + " " + String(state)); */
++	return setBitInRegister(OLATB, pin, state);
++}

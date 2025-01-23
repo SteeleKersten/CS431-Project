@@ -1,0 +1,127 @@
+From a9144ff9f97021f82e62ef144ce00f20b391fde4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Micha=C5=82=20Kowalczyk?= <mkk@ekk.pl>
+Date: Mon, 29 Nov 2021 18:51:21 +0100
+Subject: [PATCH] Resolve property as long as possible
+
+This change repeats resolve property process so that
+consecutive substitutions are possible. That may be
+required if the property requires multiple
+iterations to be resolved. For instance the
+following property requires 2 iterations:
+compiler.path={runtime.tools.{build.tarch}-{build.target}-elf-gcc.path}/bin
+After the first iterations the form requires one
+more substitution
+compiler.path={runtime.tools.xtensa-esp32-elf-gcc.path}/bin
+---
+ Arduino/Utilities/PropertiesReader.cmake | 74 +++++++++++++-----------
+ Tests/CMakeLists.txt                     |  2 +
+ 2 files changed, 42 insertions(+), 34 deletions(-)
+
+diff --git a/Arduino/Utilities/PropertiesReader.cmake b/Arduino/Utilities/PropertiesReader.cmake
+index 0c157b1..52fe67e 100644
+--- a/Arduino/Utilities/PropertiesReader.cmake
++++ b/Arduino/Utilities/PropertiesReader.cmake
+@@ -200,43 +200,49 @@ function(_properties_expand_value value return_value namespace)
+ 		return()
+ 	endif ()
+ 
+-	# Get the variables list
+-	string(REGEX MATCHALL "{[^{}/]+}" _var_list "${_value}")
+-	if (NOT "${_var_list}" STREQUAL "")
+-		list(REMOVE_DUPLICATES _var_list)
+-	endif()
+-	foreach(_var_str IN LISTS _var_list)
+-
+-		# Get the variable name
+-		string(REGEX MATCH "^{(.*)}$" _match "${_var_str}")
+-		set(_var_name "${CMAKE_MATCH_1}")
+-
+-		# Check if not resolved already
+-		if (NOT DEFINED "/prop_int_resolved.${_var_name}")
+-			# If such a variable is not in the namespace, no need to resolve
+-			if (NOT DEFINED "${namespace}.${_var_name}")
+-				properties_set_value("/prop_int_unresolved" ${_var_name} "")
+-				continue()
+-			endif()
+-
+-			# Temporarily resolve it to the same variable to handle recursive
+-			# references
+-			properties_set_value("/prop_int_resolved" "${_var_name}"
+-				"{${_var_name}}")
+-
+-			# message("=> Resolve *** ${_var_name} *** : "
+-			#	"${${namespace}.${_var_name}}")
+-			_properties_expand_value("${${namespace}.${_var_name}}"
+-				_var_value "${namespace}")
+-			properties_set_value("/prop_int_resolved" "${_var_name}"
+-				"${_var_value}")
+-			# message("=> EXPANDED ${_var_name}: ${_var_value}")
++	# Set previous value to nothing so that there is at least one iteration
++	set(_previous_value "")
++	while(NOT "${_previous_value}" STREQUAL "${_value}")
++		set(_previous_value "${_value}")
++
++		# Get the variables list
++		string(REGEX MATCHALL "{[^{}/]+}" _var_list "${_value}")
++		if (NOT "${_var_list}" STREQUAL "")
++			list(REMOVE_DUPLICATES _var_list)
+ 		endif()
++		foreach(_var_str IN LISTS _var_list)
++
++			# Get the variable name
++			string(REGEX MATCH "^{(.*)}$" _match "${_var_str}")
++			set(_var_name "${CMAKE_MATCH_1}")
++
++			# Check if not resolved already
++			if (NOT DEFINED "/prop_int_resolved.${_var_name}")
++				# If such a variable is not in the namespace, no need to resolve
++				if (NOT DEFINED "${namespace}.${_var_name}")
++					properties_set_value("/prop_int_unresolved" ${_var_name} "")
++					continue()
++				endif()
++
++				# Temporarily resolve it to the same variable to handle recursive
++				# references
++				properties_set_value("/prop_int_resolved" "${_var_name}"
++					"{${_var_name}}")
++
++				# message("=> Resolve *** ${_var_name} *** : "
++				#	"${${namespace}.${_var_name}}")
++				_properties_expand_value("${${namespace}.${_var_name}}"
++					_var_value "${namespace}")
++				properties_set_value("/prop_int_resolved" "${_var_name}"
++					"${_var_value}")
++				# message("=> EXPANDED ${_var_name}: ${_var_value}")
++			endif()
+ 
+-		string(REPLACE "${_var_str}" "${/prop_int_resolved.${_var_name}}"
+-			_value "${_value}")
++			string(REPLACE "${_var_str}" "${/prop_int_resolved.${_var_name}}"
++				_value "${_value}")
+ 
+-	endforeach()
++		endforeach()
++	endwhile()
+ 
+ 	properties_set_parent_scope("/prop_int_resolved")
+ 	properties_set_parent_scope("/prop_int_unresolved")
+diff --git a/Tests/CMakeLists.txt b/Tests/CMakeLists.txt
+index 9b35677..301901f 100644
+--- a/Tests/CMakeLists.txt
++++ b/Tests/CMakeLists.txt
+@@ -218,6 +218,7 @@ function(SetupBoardTests)
+ 		set_tests_properties("${distinct_id}" PROPERTIES
+ 			FIXTURES_REQUIRED "PlTestResults"
+ 			SKIP_RETURN_CODE 100
++			TIMEOUT 3600
+ 		)
+ 
+ 		if ("${shell_cmd}" STREQUAL "" AND
+@@ -354,6 +355,7 @@ function(SetupPlatformTests pl_url ref_url_list return_pl_tests)
+ 		set_tests_properties("${test_id}" PROPERTIES
+ 			FIXTURES_REQUIRED "TestResults"
+ 			SKIP_RETURN_CODE 100
++			TIMEOUT 3600
+ 		)
+ 		if ("${shell_cmd}" STREQUAL "" AND
+ 			NOT CMAKE_VERSION VERSION_LESS "3.16.0")
