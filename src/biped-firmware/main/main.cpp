@@ -143,7 +143,7 @@ setup()
      *
      *  TODO LAB 2 YOUR CODE HERE.
      */
-
+	timer_ = std::make_shared<Timer>(TimerParameter::group, TimerParameter::index);
     /*
      *  Instantiate the I/O expander global objects using the C++ STL
      *  std::make_shared function.
@@ -355,7 +355,7 @@ setup()
      *
      *  TODO LAB 2 YOUR CODE HERE.
      */
-
+	//timer_->setInterval(PeriodParameter::fast);
     /*
      *  Using the timer global shared pointer, attach the timer interrupt handler to the
      *  hardware timer.
@@ -365,7 +365,7 @@ setup()
      *
      *  TODO LAB 2 YOUR CODE HERE.
      */
-
+	//timer_->attachInterrupt(timerInterruptHander);
     /*
      *  Using the timer global shared pointer, enable the hardware timer.
      *
@@ -428,5 +428,5 @@ loop()
      *
      *  TODO LAB 1 YOUR CODE HERE.
      */
-	biped::firmware::bestEffortTask();
+	bestEffortTask();
 }

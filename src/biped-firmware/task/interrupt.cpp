@@ -322,7 +322,9 @@ timerInterruptHandler(void* arg)
      *
      *  TODO LAB 2 YOUR CODE HERE.
      */
-
+    unsigned long time_point_current = micros();
+    interval_real_time_task_ = time_point_current - time_point_start;
+    time_point_start = time_point_current;
     /*
      *  If the real-time task handle global pointer is not a null pointer, wake
      *  the real-time task using the FreeRTOS vTaskNotifyGiveFromISR function.
@@ -345,6 +347,10 @@ timerInterruptHandler(void* arg)
      *
      *  TODO LAB 2 YOUR CODE HERE.
      */
+    if (timer_ != nullptr)
+    {
+    	timer_->clearInterrupt();
+    }
 }
 }   // namespace firmware
 }   // namespace biped
