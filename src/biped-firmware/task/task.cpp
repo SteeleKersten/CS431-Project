@@ -245,6 +245,8 @@ ioExpanderAInterruptServiceTask(void* pvParameters)
          *
          *  TODO LAB 3 YOUR CODE HERE.
          */
+        
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
         /*
          *  If the I/O expander A global shared pointer is not a null pointer, using the I/O expander
@@ -291,6 +293,7 @@ ioExpanderAInterruptServiceTask(void* pvParameters)
      *
      *  TODO LAB 3 YOUR CODE HERE.
      */
+    vTaskDelete(nullptr);
 }
 
 void
@@ -309,6 +312,7 @@ ioExpanderBInterruptServiceTask(void* pvParameters)
          *
          *  TODO LAB 3 YOUR CODE HERE.
          */
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
         /*
          *  If the I/O expander B global shared pointer is not a null pointer, using the I/O expander
@@ -355,6 +359,7 @@ ioExpanderBInterruptServiceTask(void* pvParameters)
      *
      *  TODO LAB 3 YOUR CODE HERE.
      */
+    vTaskDelete(nullptr);
 }
 
 void
@@ -403,6 +408,8 @@ networkTask(void* pvParameters)
          *
          *  TODO LAB 3 YOUR CODE HERE.
          */
+        xTaskNotifyGive(task_handle_udp_read_biped_message_);
+        xTaskNotifyGive(task_handle_udp_write_biped_message_);
     }
 
     if (udp_camera_)
@@ -424,6 +431,7 @@ networkTask(void* pvParameters)
          *
          *  TODO LAB 3 YOUR CODE HERE.
          */
+        xTaskNotifyGive(task_handle_udp_write_camera_);
     }
 
     /*
@@ -440,6 +448,7 @@ networkTask(void* pvParameters)
      *
      *  TODO LAB 3 YOUR CODE HERE.
      */
+    vTaskDelete(nullptr);
 }
 
 void
@@ -463,6 +472,7 @@ realTimeTask(void* pvParameters)
          *
          *  TODO LAB 3 YOUR CODE HERE.
          */
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
         /*
          *  Using the Arduino micros timing function, update the start time point local variable to
@@ -470,6 +480,7 @@ realTimeTask(void* pvParameters)
          *
          *  TODO LAB 3 YOUR CODE HERE.
          */
+        time_point_start = micros();
 
         /*
          *  If the sensor global shared pointer is not a null pointer, using the sensor global shared
@@ -556,6 +567,8 @@ realTimeTask(void* pvParameters)
          *
          *  TODO LAB 3 YOUR CODE HERE.
          */
+        unsigned long time_point_current = micros();
+        execution_time_real_time_task_ = time_point_current - time_point_start;
     }
 
     /*
@@ -572,6 +585,7 @@ realTimeTask(void* pvParameters)
      *
      *  TODO LAB 3 YOUR CODE HERE.
      */
+    vTaskDelete(nullptr);
 }
 
 void
@@ -588,6 +602,7 @@ udpReadBipedMessageTask(void* pvParameters)
      *
      *  TODO LAB 3 YOUR CODE HERE.
      */
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
     /*
      *  Task loop.
@@ -671,6 +686,7 @@ udpReadBipedMessageTask(void* pvParameters)
      *
      *  TODO LAB 3 YOUR CODE HERE.
      */
+    vTaskDelete(nullptr);
 }
 
 void
@@ -687,6 +703,7 @@ udpWriteBipedMessageTask(void* pvParameters)
      *
      *  TODO LAB 3 YOUR CODE HERE.
      */
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
     /*
      *  Task loop.
@@ -804,6 +821,7 @@ udpWriteBipedMessageTask(void* pvParameters)
      *
      *  TODO LAB 3 YOUR CODE HERE.
      */
+    vTaskDelete(nullptr);
 }
 
 void
@@ -820,6 +838,7 @@ udpWriteCameraTask(void* pvParameters)
      *
      *  TODO LAB 3 YOUR CODE HERE.
      */
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
     /*
      *  Task loop.
@@ -852,6 +871,7 @@ udpWriteCameraTask(void* pvParameters)
      *
      *  TODO LAB 3 YOUR CODE HERE.
      */
+    vTaskDelete(nullptr);
 }
 }   // namespace firmware
 }   // namespace biped
