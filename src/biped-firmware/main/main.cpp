@@ -271,7 +271,7 @@ setup()
      *
      *  TODO LAB 4 YOUR CODE HERE.
      */
-    attachInterrupt(AddressParameter::io_expander_a, ioExpanderAInterruptHandler, ONHIGH);
+    void attachInterrupt(AddressParameter::io_expander_a, ioExpanderAInterruptHandler, ONHIGH);
 
     /*
      *  Using the attachInterrupt function in the interrupt header, attach the encoder
