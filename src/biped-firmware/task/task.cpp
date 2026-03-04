@@ -256,9 +256,9 @@ ioExpanderAInterruptServiceTask(void* pvParameters)
          *
          *  TODO LAB 4 YOUR CODE HERE.
          */
-        if (io_expander_a_global_shared_pointer_ != nullptr)
+        if (io_expander_a_ != nullptr)
         {
-            io_expander_a_global_shared_pointer_->interruptCallback();
+            io_expander_a_->onInterrupt();
         }
 
         /*
@@ -281,8 +281,7 @@ ioExpanderAInterruptServiceTask(void* pvParameters)
          *
          *  TODO LAB 4 YOUR CODE HERE.
          */
-        """uncertain"""
-        biped::firmware::attachInterrupt(digitalPinToInterrupt(io_expander_a_interrupt), ioExpanderAInterruptHandler, HIGH);
+        biped::firmware::attachInterrupt(ESP32Pin::io_expander_a_interrupt, ioExpanderAInterruptHandler, HIGH);
     }
 
     /*
@@ -328,9 +327,9 @@ ioExpanderBInterruptServiceTask(void* pvParameters)
          *
          *  TODO LAB 4 YOUR CODE HERE.
          */
-        if (io_expander_b_global_shared_pointer_ != nullptr)
+        if (io_expander_b_!= nullptr)
         {
-            io_expander_b_global_shared_pointer_->interruptCallback();
+            io_expander_b_->onInterrupt();
         }
 
         /*
@@ -353,7 +352,7 @@ ioExpanderBInterruptServiceTask(void* pvParameters)
          *
          *  TODO LAB 4 YOUR CODE HERE.
          */
-        biped::firmware::attachInterrupt(digitalPinToInterrupt(io_expander_b_interrupt), ioExpanderBInterruptHandler, HIGH);
+        biped::firmware::attachInterrupt(ESP32Pin::io_expander_b_interrupt, ioExpanderBInterruptHandler, HIGH);
     }
 
     /*
