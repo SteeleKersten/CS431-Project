@@ -66,6 +66,8 @@ setup()
      *
      *  TODO LAB 4 YOUR CODE HERE.
      */
+    pinMode(ESP32Pin::io_expander_a_interrupt, PULLUP);
+    pinMode(ESP32Pin::io_expander_a_interrupt, PULLUP);
 
     /*
      *  Set Arduino I2C driver object (Wire) SDA and SCL pins
@@ -153,6 +155,8 @@ setup()
      *
      *  TODO LAB 4 YOUR CODE HERE.
      */
+    io_expander_a_ = std::make_shared<IOExpander>(AddressParameter::io_expander_a);
+    io_expander_b_ = std::make_shared<IOExpander>(AddressParameter::io_expander_b);
 
     /*
      *  Instantiate the UDP and Wi-Fi global objects using the C++ STL
@@ -267,6 +271,8 @@ setup()
      *
      *  TODO LAB 4 YOUR CODE HERE.
      */
+    biped::firmware::attachInterrupt(AddressParameter::io_expander_a, ioExpanderAInterruptHandler,
+    ONHIGH);
 
     /*
      *  Using the attachInterrupt function in the interrupt header, attach the encoder
@@ -305,6 +311,8 @@ setup()
      *
      *  TODO LAB 4 YOUR CODE HERE.
      */
+    io_expander_a_->pinModePortA(IOExpanderAPortAPin::push_button_a, PULLUP);
+    io_expander_a_->pinModePortA(IOExpanderAPortAPin::push_button_b, PULLUP);
 
     /*
      *  Using I/O expander global shared pointers and the I/O expander attachInterruptPort
@@ -326,6 +334,12 @@ setup()
      *
      *  TODO LAB 4 YOUR CODE HERE.
      */
+    io_expander_a_->attachInterruptPortA(IOExpanderAPortAPin::push_button_a,
+            pushButtonAInterruptHandler, nullptr, FALLING);
+    io_expander_a_->attachInterruptPortA(IOExpanderAPortAPin::push_button_b,
+            pushButtonBInterruptHandler, nullptr, FALLING);
+    io_expander_b_->attachInterruptPortB(IOExpanderAPortBPin::push_button_c,
+            pushButtonCInterruptHandler, nullptr, FALLING);
 
     /*
      *  Create the real-time task, all UDP tasks, and the network task using the
@@ -358,12 +372,11 @@ setup()
     xTaskCreatePinnedToCore(udpWriteBipedMessageTask, "udpWriteBipedMessageTask",
             TaskParameter::stack_size, nullptr, TaskParameter::priority_min,
             &task_handle_udp_write_biped_message_, TaskParameter::core_1);
-    xTaskCreatePinnedToCore(udpWriteCameraTask, "udpWriteCameraTask",
-            TaskParameter::stack_size, nullptr, TaskParameter::priority_min,
-            &task_handle_udp_write_camera_, TaskParameter::core_1);
-    xTaskCreatePinnedToCore(networkTask, "networkTask",
-            TaskParameter::stack_size, nullptr, TaskParameter::priority_min,
-            &task_handle_network_, TaskParameter::core_1);
+    xTaskCreatePinnedToCore(udpWriteCameraTask, "udpWriteCameraTask", TaskParameter::stack_size,
+            nullptr, TaskParameter::priority_min, &task_handle_udp_write_camera_,
+            TaskParameter::core_1);
+    xTaskCreatePinnedToCore(networkTask, "networkTask", TaskParameter::stack_size, nullptr,
+            TaskParameter::priority_min, &task_handle_network_, TaskParameter::core_1);
 
     /*
      *  Using the timer global shared pointer, set the hardware timer interval to be the fast

@@ -218,7 +218,7 @@ ioExpanderAInterruptHandler()
      *
      *  TODO LAB 4 YOUR CODE HERE.
      */
-
+    detachInterrupt(AddressParameter::io_expander_a);
     /*
      *  If the I/O expander A interrupt service task handle global pointer is not
      *  a null pointer, using the FreeRTOS vTaskNotifyGiveFromISR function, wake
@@ -264,7 +264,7 @@ ioExpanderBInterruptHandler()
      *
      *  TODO LAB 4 YOUR CODE HERE.
      */
-
+    detachInterrupt(AddressParameter::io_expander_b);
     /*
      *  If the I/O expander B interrupt service task handle global pointer is not
      *  a null pointer, using the FreeRTOS vTaskNotifyGiveFromISR function, wake

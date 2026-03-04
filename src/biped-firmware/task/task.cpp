@@ -76,7 +76,7 @@ bestEffortTask()
      *  variables.
      *
      *  TODO LAB 1 YOUR CODE HERE.
-	 */
+     */
     Display(0) << "Biped: #" << serial_number_;
     /*
      *  Using the Display class in the display header, print to the second line of the OLED display the
@@ -90,7 +90,8 @@ bestEffortTask()
      *
      *  TODO LAB 1 YOUR CODE HERE.
      */
-    Display(1) << "Real-Time: " << execution_time_real_time_task_ << " " << interval_real_time_task_;
+    Display(1) << "Real-Time: " << execution_time_real_time_task_ << " "
+            << interval_real_time_task_;
     /*
      *  Using the ESP-IDF ESP object in the Esp header, calculate the heap utilization percentage (i.e.,
      *  the percentage of the heap used) using the ESP-IDF getFreeHeap and getHeapSize functions in the
@@ -107,7 +108,8 @@ bestEffortTask()
      *
      *  TODO LAB 1 YOUR CODE HERE.
      */
-    uint32_t heap_utilization_percentage = (uint32_t)(((float)ESP.getHeapSize() - (float)ESP.getFreeHeap()) / (float)ESP.getHeapSize() * 100.0);
+    uint32_t heap_utilization_percentage = (uint32_t) (((float) ESP.getHeapSize()
+            - (float) ESP.getFreeHeap()) / (float) ESP.getHeapSize() * 100.0);
     Display(2) << "Heap: " << uint32_t(heap_utilization_percentage) << "%";
     /*
      *  If the Wi-Fi global shared pointer is not a null pointer, check the Wi-Fi status using the Wi-Fi
@@ -128,20 +130,20 @@ bestEffortTask()
      *
      *  TODO LAB 1 YOUR CODE HERE.
      */
-    if(wifi_ != nullptr)
+    if (wifi_ != nullptr)
     {
-    	if(wifi_->getWiFiStatus() == 3)
-    	{
-    		Display(3) << "Wi-Fi: " << wifi_->getWiFiLocalIP();
-    	}
-    	else
-    	{
-    		Display(3) << "Wi-Fi: disconnected";
-    	}
+        if (wifi_->getWiFiStatus() == 3)
+        {
+            Display(3) << "Wi-Fi: " << wifi_->getWiFiLocalIP();
+        }
+        else
+        {
+            Display(3) << "Wi-Fi: disconnected";
+        }
     }
     else
     {
-       	Display(3) << "Wi-Fi: disconnected";
+        Display(3) << "Wi-Fi: disconnected";
     }
 
     /*
@@ -161,20 +163,20 @@ bestEffortTask()
      *
      *  TODO LAB 1 YOUR CODE HERE.
      */
-    if(controller_ != nullptr)
+    if (controller_ != nullptr)
     {
-    	if(controller_->getActiveStatus())
-    	{
-    		Display(4) << "Controller: active";
-    	}
-    	else
-    	{
-        	Display(4) << "Controller: inactive";
-       	}
+        if (controller_->getActiveStatus())
+        {
+            Display(4) << "Controller: active";
+        }
+        else
+        {
+            Display(4) << "Controller: inactive";
+        }
     }
     else
     {
-    	Display(4) << "Controller: inactive";
+        Display(4) << "Controller: inactive";
     }
     /*
      *  If the planner global shared pointer is not a null pointer, using the planner global shared pointer,
@@ -197,13 +199,13 @@ bestEffortTask()
      *
      *  TODO LAB 1 YOUR CODE HERE.
      */
-    if(planner_stage < 0)
+    if (planner_stage < 0)
     {
-    	Display(5) << "Planner: inactive";
+        Display(5) << "Planner: inactive";
     }
     else
     {
-    	Display(5) << "Planner: stage " << planner_stage;
+        Display(5) << "Planner: stage " << planner_stage;
     }
     /*
      *  If the NeoPixel global shared pointer is not a null pointer, using the NeoPixel global shared
@@ -214,9 +216,9 @@ bestEffortTask()
      *
      *  TODO LAB 1 YOUR CODE HERE.
      */
-    if(neopixel_ != nullptr)
+    if (neopixel_ != nullptr)
     {
-    	neopixel_->show();
+        neopixel_->show();
     }
     /*
      *  Using the Display class in the display header, display the streamed items by flushing the
@@ -245,7 +247,7 @@ ioExpanderAInterruptServiceTask(void* pvParameters)
          *
          *  TODO LAB 3 YOUR CODE HERE.
          */
-        
+
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
         /*
@@ -256,9 +258,9 @@ ioExpanderAInterruptServiceTask(void* pvParameters)
          *
          *  TODO LAB 4 YOUR CODE HERE.
          */
-        if (io_expander_a_global_shared_pointer_ != nullptr)
+        if (io_expander_a_ != nullptr)
         {
-            io_expander_a_global_shared_pointer_->interruptCallback();
+            io_expander_a_->onInterrupt();
         }
 
         /*
@@ -281,8 +283,8 @@ ioExpanderAInterruptServiceTask(void* pvParameters)
          *
          *  TODO LAB 4 YOUR CODE HERE.
          */
-        """uncertain"""
-        biped::firmware::attachInterrupt(digitalPinToInterrupt(io_expander_a_interrupt), ioExpanderAInterruptHandler, HIGH);
+        biped::firmware::attachInterrupt(ESP32Pin::io_expander_a_interrupt,
+                ioExpanderAInterruptHandler, HIGH);
     }
 
     /*
@@ -328,9 +330,9 @@ ioExpanderBInterruptServiceTask(void* pvParameters)
          *
          *  TODO LAB 4 YOUR CODE HERE.
          */
-        if (io_expander_b_global_shared_pointer_ != nullptr)
+        if (io_expander_b_ != nullptr)
         {
-            io_expander_b_global_shared_pointer_->interruptCallback();
+            io_expander_b_->onInterrupt();
         }
 
         /*
@@ -353,7 +355,8 @@ ioExpanderBInterruptServiceTask(void* pvParameters)
          *
          *  TODO LAB 4 YOUR CODE HERE.
          */
-        biped::firmware::attachInterrupt(digitalPinToInterrupt(io_expander_b_interrupt), ioExpanderBInterruptHandler, HIGH);
+        biped::firmware::attachInterrupt(ESP32Pin::io_expander_b_interrupt,
+                ioExpanderBInterruptHandler, HIGH);
     }
 
     /*
