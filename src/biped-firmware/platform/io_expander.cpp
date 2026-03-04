@@ -239,7 +239,7 @@ IOExpander::attachInterruptPortA(const uint8_t& pin, void
              *
              *  TODO LAB 4 YOUR CODE HERE.
              */
-        	io_expander_driver_->setBitInRegister(INTCONA, 0, 0);
+        	io_expander_driver_->setBitInRegister(INTCONA, pin, 1);
             break;
         }
         case ONLOW:
@@ -276,7 +276,7 @@ IOExpander::attachInterruptPortA(const uint8_t& pin, void
              *
              *  TODO LAB 4 YOUR CODE HERE.
              */
-
+        	io_expander_driver_->setBitInRegister(INTCONA, pin, 0);
             /*
              *  Using the class member Arduino I/O expander driver shared pointer and
              *  the Arduino I/O expander driver setBitInRegister function in the
@@ -308,7 +308,7 @@ IOExpander::attachInterruptPortA(const uint8_t& pin, void
              *
              *  TODO LAB 4 YOUR CODE HERE.
              */
-
+        	io_expander_driver_->setBitInRegister(DEFVALA, pin, 1);
             break;
         }
         case ONHIGH:
@@ -504,7 +504,7 @@ IOExpander::attachInterruptPortB(const uint8_t& pin, void
              *
              *  Note that the setBitInRegister sets a single bin in the given register
              *  address. The first argument corresponds to the register address for one
-             *  port, the second argument corresponds to the bit to be set in the given
+             *  port, the second argument corresponds to the bit to be set in the given1379
              *  register (i.e., the pin number), and the third argument corresponds to
              *  the value of the bit to be set in the given register.
              *
