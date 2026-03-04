@@ -171,6 +171,9 @@ setup()
      *
      *  TODO LAB 5 YOUR CODE HERE.
      */
+    udp_biped_message_ = std::make_shared<biped::firmware::UDP>();
+    udp_camera_ = std::make_shared<biped::firmware::UDP>();
+    wifi_ = std::make_shared<WiFi>();
 
     /*
      *  Instantiate the sensor and actuator global objects using the C++ STL
