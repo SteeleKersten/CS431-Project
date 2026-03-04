@@ -334,7 +334,7 @@ setup()
      *  TODO LAB 4 YOUR CODE HERE.
      */
     io_expander_a_->attachInterruptPortA(IOExpanderAPortAPin::push_button_a, pushButtonAInterruptHandler, nullptr, FALLING);
-    io_expander_a_->attachInterruptPortB(IOExpanderAPortAPin::push_button_b, pushButtonBInterruptHandler, nullptr, FALLING);
+    io_expander_a_->attachInterruptPortA(IOExpanderAPortAPin::push_button_b, pushButtonBInterruptHandler, nullptr, FALLING);
     io_expander_b_->attachInterruptPortB(IOExpanderAPortBPin::push_button_c, pushButtonCInterruptHandler, nullptr, FALLING);
 
     /*
