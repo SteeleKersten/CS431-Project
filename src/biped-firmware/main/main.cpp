@@ -271,7 +271,8 @@ setup()
      *
      *  TODO LAB 4 YOUR CODE HERE.
      */
-     biped::firmware::attachInterrupt(AddressParameter::io_expander_a, ioExpanderAInterruptHandler, ONHIGH);
+    biped::firmware::attachInterrupt(AddressParameter::io_expander_a, ioExpanderAInterruptHandler,
+    ONHIGH);
 
     /*
      *  Using the attachInterrupt function in the interrupt header, attach the encoder
@@ -333,9 +334,12 @@ setup()
      *
      *  TODO LAB 4 YOUR CODE HERE.
      */
-    io_expander_a_->attachInterruptPortA(IOExpanderAPortAPin::push_button_a, pushButtonAInterruptHandler, nullptr, FALLING);
-    io_expander_a_->attachInterruptPortA(IOExpanderAPortAPin::push_button_b, pushButtonBInterruptHandler, nullptr, FALLING);
-    io_expander_b_->attachInterruptPortB(IOExpanderAPortBPin::push_button_c, pushButtonCInterruptHandler, nullptr, FALLING);
+    io_expander_a_->attachInterruptPortA(IOExpanderAPortAPin::push_button_a,
+            pushButtonAInterruptHandler, nullptr, FALLING);
+    io_expander_a_->attachInterruptPortA(IOExpanderAPortAPin::push_button_b,
+            pushButtonBInterruptHandler, nullptr, FALLING);
+    io_expander_b_->attachInterruptPortB(IOExpanderAPortBPin::push_button_c,
+            pushButtonCInterruptHandler, nullptr, FALLING);
 
     /*
      *  Create the real-time task, all UDP tasks, and the network task using the
