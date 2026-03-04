@@ -283,7 +283,7 @@ ioExpanderAInterruptServiceTask(void* pvParameters)
          *
          *  TODO LAB 4 YOUR CODE HERE.
          */
-        biped::firmware::attachInterrupt(ESP32Pin::io_expander_a_interrupt,
+        biped::firmware::attachInterrupt(digitalPinToInterrupt(ESP32Pin::io_expander_a_interrupt),
                 ioExpanderAInterruptHandler, HIGH);
     }
 
@@ -355,7 +355,7 @@ ioExpanderBInterruptServiceTask(void* pvParameters)
          *
          *  TODO LAB 4 YOUR CODE HERE.
          */
-        biped::firmware::attachInterrupt(ESP32Pin::io_expander_b_interrupt,
+        biped::firmware::attachInterrupt(digitalPinToInterrupt(ESP32Pin::io_expander_b_interrupt),
                 ioExpanderBInterruptHandler, HIGH);
     }
 
