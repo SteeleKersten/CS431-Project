@@ -921,7 +921,7 @@ udpWriteCameraTask(void* pvParameters)
          */
         if (camera_ != nullptr)
         {
-            camera_->SendJPGFrameOverUDP(NetworkParameter::udp_camera_, NetworkParameter::ip_ground_station, NetworkParameter::port_udp_camera);
+            camera_->SendJPGFrameOverUDP(udp_camera_, NetworkParameter::ip_ground_station, NetworkParameter::port_udp_camera);
         }
     }
 
