@@ -96,6 +96,7 @@ constexpr uint8_t time_of_flight_right_shutdown = 1;    //!< Right time-of-fligh
  */
 namespace IOExpanderBPortAPin
 {
+constexpr uint8_t test_1 = 0;
 }   // namespace IOExpanderBPortAPin
 
 /*

@@ -297,11 +297,14 @@ pushButtonAInterruptHandler(void* arg)
      *
      *  TODO LAB 8 YOUR CODE HERE.
      */
+    //TODO REMOVE; demo for lab 4
+    ++serial_number_;
 }
 
 void IRAM_ATTR
 pushButtonBInterruptHandler(void* arg)
 {
+    --serial_number_;
 }
 
 void IRAM_ATTR

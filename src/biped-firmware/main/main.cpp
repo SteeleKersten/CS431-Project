@@ -66,6 +66,7 @@ setup()
      *
      *  TODO LAB 4 YOUR CODE HERE.
      */
+
     pinMode(ESP32Pin::io_expander_a_interrupt, INPUT_PULLUP);
     pinMode(ESP32Pin::io_expander_b_interrupt, INPUT_PULLUP);
 
@@ -274,8 +275,10 @@ setup()
      *
      *  TODO LAB 4 YOUR CODE HERE.
      */
-    biped::firmware::attachInterrupt(digitalPinToInterrupt(ESP32Pin::io_expander_a_interrupt), ioExpanderAInterruptHandler, ONHIGH);
-    biped::firmware::attachInterrupt(digitalPinToInterrupt(ESP32Pin::io_expander_b_interrupt), ioExpanderBInterruptHandler, ONHIGH);
+    biped::firmware::attachInterrupt(digitalPinToInterrupt(ESP32Pin::io_expander_a_interrupt),
+            ioExpanderAInterruptHandler, ONHIGH);
+    biped::firmware::attachInterrupt(digitalPinToInterrupt(ESP32Pin::io_expander_b_interrupt),
+            ioExpanderBInterruptHandler, ONHIGH);
 
     /*
      *  Using the attachInterrupt function in the interrupt header, attach the encoder
@@ -317,6 +320,7 @@ setup()
     io_expander_a_->pinModePortA(IOExpanderAPortAPin::push_button_a, INPUT_PULLUP);
     io_expander_a_->pinModePortA(IOExpanderAPortAPin::push_button_b, INPUT_PULLUP);
     io_expander_a_->pinModePortB(IOExpanderAPortBPin::push_button_c, INPUT_PULLUP);
+    io_expander_b_->pinModePortA(IOExpanderBPortAPin::test_1, INPUT_PULLUP);
 
     /*
      *  Using I/O expander global shared pointers and the I/O expander attachInterruptPort
@@ -339,11 +343,13 @@ setup()
      *  TODO LAB 4 YOUR CODE HERE.
      */
     io_expander_a_->attachInterruptPortA(IOExpanderAPortAPin::push_button_a,
-            pushButtonAInterruptHandler, nullptr, FALLING);
+            pushButtonAInterruptHandler, nullptr, ONLOW);
     io_expander_a_->attachInterruptPortA(IOExpanderAPortAPin::push_button_b,
             pushButtonBInterruptHandler, nullptr, FALLING);
     io_expander_a_->attachInterruptPortB(IOExpanderAPortBPin::push_button_c,
             pushButtonCInterruptHandler, nullptr, FALLING);
+    io_expander_b_->attachInterruptPortA(IOExpanderBPortAPin::test_1,
+            pushButtonBInterruptHandler, nullptr, FALLING);
 
     /*
      *  Create the real-time task, all UDP tasks, and the network task using the
@@ -381,7 +387,8 @@ setup()
             TaskParameter::core_1);
     xTaskCreatePinnedToCore(networkTask, "networkTask", TaskParameter::stack_size, nullptr,
             TaskParameter::priority_min, &task_handle_network_, TaskParameter::core_1);
-    https://en.wikipedia.org/wiki/Pull-up_resistor
+    https:
+    //en.wikipedia.org/wiki/Pull-up_resistor
     /*
      *  Using the timer global shared pointer, set the hardware timer interval to be the fast
      *  domain period. Be aware of the unit conversions and use the appropriate functions

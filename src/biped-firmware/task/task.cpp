@@ -211,7 +211,11 @@ bestEffortTask()
         Display(5) << "Planner: stage " << planner_stage;
     }
 
-    Display(6) << "Button A: " << io_expander_a_->digitalReadPortA(static_cast<uint8_t>(IOExpanderAPortAPin::push_button_a));
+    //TODO REMOVE; demo for lab 4
+    Display(6) << "Buttons: " << io_expander_a_->digitalReadPortA(static_cast<uint8_t>(IOExpanderAPortAPin::push_button_a))
+            << " " << io_expander_a_->digitalReadPortA(static_cast<uint8_t>(IOExpanderAPortAPin::push_button_b))
+            << " " << io_expander_a_->digitalReadPortB(static_cast<uint8_t>(IOExpanderAPortBPin::push_button_c))
+            << " " << io_expander_b_->digitalReadPortA(static_cast<uint8_t>(IOExpanderBPortAPin::test_1));
     /*
      *  If the NeoPixel global shared pointer is not a null pointer, using the NeoPixel global shared
      *  pointer, show the NeoPixel frame by flushing the frame to the NeoPixel array.
@@ -290,7 +294,7 @@ ioExpanderAInterruptServiceTask(void* pvParameters)
          *  TODO LAB 4 YOUR CODE HERE.
          */
         biped::firmware::attachInterrupt(digitalPinToInterrupt(ESP32Pin::io_expander_a_interrupt),
-                ioExpanderAInterruptHandler, HIGH);
+                ioExpanderAInterruptHandler, ONHIGH);
     }
 
     /*
@@ -362,7 +366,7 @@ ioExpanderBInterruptServiceTask(void* pvParameters)
          *  TODO LAB 4 YOUR CODE HERE.
          */
         biped::firmware::attachInterrupt(digitalPinToInterrupt(ESP32Pin::io_expander_b_interrupt),
-                ioExpanderBInterruptHandler, HIGH);
+                ioExpanderBInterruptHandler, ONHIGH);
     }
 
     /*
@@ -397,7 +401,7 @@ networkTask(void* pvParameters)
     {
         wifi_->initialize();
     }
-    
+
 
     /*
      *  Use a spin lock to block this task when the Wi-Fi global shared pointer is a null
