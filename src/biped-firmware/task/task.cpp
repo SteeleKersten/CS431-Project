@@ -211,11 +211,6 @@ bestEffortTask()
         Display(5) << "Planner: stage " << planner_stage;
     }
 
-    //TODO REMOVE; demo for lab 4
-    Display(6) << "Buttons: " << io_expander_a_->digitalReadPortA(static_cast<uint8_t>(IOExpanderAPortAPin::push_button_a))
-            << " " << io_expander_a_->digitalReadPortA(static_cast<uint8_t>(IOExpanderAPortAPin::push_button_b))
-            << " " << io_expander_a_->digitalReadPortB(static_cast<uint8_t>(IOExpanderAPortBPin::push_button_c))
-            << " " << io_expander_b_->digitalReadPortA(static_cast<uint8_t>(IOExpanderBPortAPin::test_1));
     /*
      *  If the NeoPixel global shared pointer is not a null pointer, using the NeoPixel global shared
      *  pointer, show the NeoPixel frame by flushing the frame to the NeoPixel array.
