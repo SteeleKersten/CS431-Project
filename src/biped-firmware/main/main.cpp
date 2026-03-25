@@ -184,7 +184,7 @@ setup()
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
-    imu_ = std::make_shared<Sensor>();
+    sensor_ = std::make_shared<Sensor>();
     
     /*
      *  Instantiate the controller object using the C++ STL std::make_shared
@@ -303,8 +303,14 @@ setup()
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
-    biped::firmware::attachInterrupt(digitalPinToInterrupt(ESP32Pin::left_encoder_interrupt),
-        leftEncoderInterruptHandler, RISING);
+    biped::firmware::attachInterrupt(digitalPinToInterrupt(ESP32Pin::motor_left_encoder_a),
+            encoderLeftAInterruptHandler, RISING);
+    biped::firmware::attachInterrupt(digitalPinToInterrupt(ESP32Pin::motor_left_encoder_b),
+            encoderLeftBInterruptHandler, RISING);
+    biped::firmware::attachInterrupt(digitalPinToInterrupt(ESP32Pin::motor_right_encoder_a),
+            encoderRightAInterruptHandler, RISING);
+    biped::firmware::attachInterrupt(digitalPinToInterrupt(ESP32Pin::motor_right_encoder_b),
+            encoderRightBInterruptHandler, RISING);
 
     /*
      *  Using I/O expander global shared pointers and the I/O expander pinModePort

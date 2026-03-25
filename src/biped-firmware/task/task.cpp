@@ -521,9 +521,9 @@ realTimeTask(void* pvParameters)
          *
          *  TODO LAB 6 YOUR CODE HERE.
          */
-        if (imu_)
+        if (sensor_)
         {
-            imu_->sense();
+            sensor_->sense(true);
         }
 
         /*
@@ -550,9 +550,9 @@ realTimeTask(void* pvParameters)
              *
              *  TODO LAB 6 YOUR CODE HERE.
              */
-            if (imu_)
+            if (sensor_)
             {
-                imu_->senseSlow();
+                sensor_->sense(false);
             }
 
             /*
