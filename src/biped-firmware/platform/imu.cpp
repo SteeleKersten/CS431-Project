@@ -32,6 +32,7 @@ IMU::IMU()
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
+    initialize();
 }
 
 IMUData
@@ -42,7 +43,7 @@ IMU::getData() const
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
-    return IMUData();
+    return mpu6050_data_.IMUData;
 }
 
 void
@@ -65,7 +66,7 @@ IMU::read()
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
-
+    mpu6050_.getEvent()
     /*
      *  Using the populated MPU6050 sensor event structs, populate
      *  the corresponding entries in the class member MPU6050 IMU data
