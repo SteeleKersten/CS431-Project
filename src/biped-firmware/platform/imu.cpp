@@ -198,7 +198,7 @@ IMU::calculateAttitude()
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
-    const double attitude_y_raw = 0;
+    const double attitude_y_raw = atan2(-mpu6050_data_.acceleration_x, sqrt(pow(mpu6050_data_.acceleration_y, 2) + pow(mpu6050_data_.acceleration_z, 2)));
 
 
     /*
@@ -216,7 +216,7 @@ IMU::calculateAttitude()
      *  TODO LAB 6 YOUR CODE HERE.
      */
     mpu6050_data_.attitude_y = degreesToRadians(attitude_y_kalman_filter);
-    
+
 }
 }   // namespace firmware
 }   // namespace biped
