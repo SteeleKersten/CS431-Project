@@ -52,6 +52,8 @@ namespace firmware
 void
 bestEffortTask()
 {
+    
+
     /*
      *  Declare planner stage and set to -1.
      */
@@ -234,6 +236,23 @@ bestEffortTask()
      */
 
     Display::display();
+
+    //demonstrate actuation by creating and initializing an ActuationCommand struct
+    static bool forward = true;
+    ActuationCommand actuation_command;
+    actuation_command.motor_enable = true;
+    actuation_command.motor_left_forward = forward;
+    actuation_command.motor_right_forward = forward;
+    actuation_command.motor_left_pwm = 50.0;  // Above minimum PWM (0)
+    actuation_command.motor_right_pwm = 50.0; // Above minimum PWM (0)
+
+    if (actuator_ != nullptr)
+    {
+        actuator_->actuate(actuation_command);
+    }
+
+    // Toggle direction for next call
+    forward = !forward;
 }
 
 void
