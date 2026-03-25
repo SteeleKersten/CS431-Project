@@ -171,7 +171,9 @@ Sensor::sense(const bool& fast_domain)
          *
          *  TODO LAB 6 YOUR CODE HERE.
          */
-        time_of_flight_data_ = time_of_flight_->read(); //!!!uncertain call
+        time_of_flight_data_.range_left = time_of_flight_left_->read();
+        time_of_flight_data_.range_middle = time_of_flight_middle_->read();
+        time_of_flight_data_.range_right = time_of_flight_right_->read();
     }
 }
 
