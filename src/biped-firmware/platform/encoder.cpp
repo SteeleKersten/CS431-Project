@@ -151,7 +151,9 @@ Encoder::onLeftA()
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
-	steps_left_ = digitalReadFromISR(ESP32Pin::motor_left_encoder_a);
+    if(!digitalReadFromISR(ESP32Pin::motor_left_encoder_b)){
+        ++steps_left_;
+    }
 }
 
 void IRAM_ATTR
@@ -166,7 +168,9 @@ Encoder::onLeftB()
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
-	steps_left_ = digitalReadFromISR(ESP32Pin::motor_left_encoder_b);
+    if(!digitalReadFromISR(ESP32Pin::motor_left_encoder_a)){
+        --steps_left_;
+    }
 }
 
 void IRAM_ATTR
@@ -181,7 +185,9 @@ Encoder::onRightA()
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
-	steps_right_ = digitalReadFromISR(ESP32Pin::motor_right_encoder_a);
+    if(!digitalReadFromISR(ESP32Pin::motor_right_encoder_b)){
+        --steps_right_;
+    }
 }
 
 void IRAM_ATTR
@@ -196,7 +202,9 @@ Encoder::onRightB()
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
-	steps_right_ = digitalReadFromISR(ESP32Pin::motor_right_encoder_b);
+    if(!digitalReadFromISR(ESP32Pin::motor_right_encoder_a)){
+        ++steps_right_;
+    }
 }
 }   // namespace firmware
 }   // namespace biped
