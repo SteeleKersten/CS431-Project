@@ -115,7 +115,7 @@ Actuator::actuate(const ActuationCommand& actuation_command)
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
-	io_expander_a_->digitalWritePortA(IOExpanderAPortAPin::motor_left_direction, actuation_command_.motor_left_forward);
+	io_expander_a_->digitalWritePortA(IOExpanderAPortAPin::motor_left_direction, !actuation_command_.motor_left_forward);
 	io_expander_a_->digitalWritePortA(IOExpanderAPortAPin::motor_right_direction, actuation_command_.motor_right_forward);
     /*
      *  Using the clamp function from the math header, clamp

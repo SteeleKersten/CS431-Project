@@ -151,8 +151,10 @@ Encoder::onLeftA()
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
-    if(!digitalReadFromISR(ESP32Pin::motor_left_encoder_b)){
+    if(digitalReadFromISR(ESP32Pin::motor_left_encoder_a) != digitalReadFromISR(ESP32Pin::motor_left_encoder_b)){
         ++steps_left_;
+    } else {
+        --steps_left_;
     }
 }
 
@@ -168,8 +170,10 @@ Encoder::onLeftB()
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
-    if(!digitalReadFromISR(ESP32Pin::motor_left_encoder_a)){
+    if(digitalReadFromISR(ESP32Pin::motor_left_encoder_a) != digitalReadFromISR(ESP32Pin::motor_left_encoder_b)){
         --steps_left_;
+    } else {
+        ++steps_left_;
     }
 }
 
@@ -185,8 +189,10 @@ Encoder::onRightA()
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
-    if(!digitalReadFromISR(ESP32Pin::motor_right_encoder_b)){
+    if(digitalReadFromISR(ESP32Pin::motor_right_encoder_a) != digitalReadFromISR(ESP32Pin::motor_right_encoder_b)){
         --steps_right_;
+    } else {
+        ++steps_right_;
     }
 }
 
@@ -202,8 +208,10 @@ Encoder::onRightB()
      *
      *  TODO LAB 6 YOUR CODE HERE.
      */
-    if(!digitalReadFromISR(ESP32Pin::motor_right_encoder_a)){
+    if(digitalReadFromISR(ESP32Pin::motor_right_encoder_a) != digitalReadFromISR(ESP32Pin::motor_right_encoder_b)){
         ++steps_right_;
+    } else {
+        --steps_right_;
     }
 }
 }   // namespace firmware

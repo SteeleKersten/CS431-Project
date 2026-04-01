@@ -88,11 +88,11 @@ IMU::read()
      *  TODO LAB 6 YOUR CODE HERE.
      */
     mpu6050_data_.acceleration_x = acceleration.acceleration.x;
-    mpu6050_data_.acceleration_y = acceleration.acceleration.y;
+    mpu6050_data_.acceleration_y = -acceleration.acceleration.y;
     mpu6050_data_.acceleration_z = acceleration.acceleration.z;
-    mpu6050_data_.angular_velocity_x = angular_velocity.gyro.x;
+    mpu6050_data_.angular_velocity_x = -angular_velocity.gyro.x;
     mpu6050_data_.angular_velocity_y = angular_velocity.gyro.y;
-    mpu6050_data_.angular_velocity_z = angular_velocity.gyro.z;
+    mpu6050_data_.angular_velocity_z = -angular_velocity.gyro.z;
     mpu6050_data_.temperature = temperature.temperature;
     mpu6050_data_.compass_x = 0;
     mpu6050_data_.compass_y = 0;
