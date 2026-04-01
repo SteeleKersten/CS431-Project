@@ -36,7 +36,7 @@ OpenLoopController::getReference() const
      *
      *  TODO LAB 7 YOUR CODE HERE.
      */
-    return 0;
+    return reference_;
 }
 
 void
@@ -47,6 +47,7 @@ OpenLoopController::setGain(const double& gain)
      *
      *  TODO LAB 7 YOUR CODE HERE.
      */
+    gain_ = gain;
 }
 
 void
@@ -57,6 +58,7 @@ OpenLoopController::setSaturation(const ControllerSaturation& saturation)
      *
      *  TODO LAB 7 YOUR CODE HERE.
      */
+    saturation_ = saturation;
 }
 
 void
@@ -67,6 +69,7 @@ OpenLoopController::setReference(const double& reference)
      *
      *  TODO LAB 7 YOUR CODE HERE.
      */
+    reference_ = reference;
 }
 
 double
@@ -86,6 +89,7 @@ OpenLoopController::control()
      *
      *  TODO LAB 7 YOUR CODE HERE.
      */
+    const double output = gain_ * clamp(reference_, saturation_.input_lower_bound, saturation_.input_upper_bound);
 
     /*
      *  Return the output computed above clamped between the
@@ -95,7 +99,7 @@ OpenLoopController::control()
      *
      *  TODO LAB 7 YOUR CODE HERE.
      */
-    return 0;
+    return clamp(output, saturation_.output_lower_bound, saturation_.output_upper_bound);
 }
 }   // namespace firmware
 }   // namespace biped
