@@ -493,7 +493,7 @@ Controller::control(const bool& fast_domain)
          *
          *  TODO LAB 7 YOUR CODE HERE.
          */
-        pid_controller_position_x_.setState(imu_data.attitude_x);
+        pid_controller_position_x_.setState(enc_data.position_x);
 
         /*
          *  Set the error differential input (delta e) of the class member
