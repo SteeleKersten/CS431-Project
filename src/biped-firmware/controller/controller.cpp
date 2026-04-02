@@ -17,6 +17,8 @@
 #include "sensor/sensor.h"
 #include "utility/math.h"
 
+#include "platform/serial.h"
+
 /*
  *  Biped namespace.
  */
@@ -618,10 +620,10 @@ Controller::control(const bool& fast_domain)
      *
      *  TODO LAB 7 YOUR CODE HERE.
      */
-    actuation_command_.motor_left_pwm = clamp(left_motor_output,
+    actuation_command_.motor_left_pwm = clamp(abs(left_motor_output),
             static_cast<double>(MotorParameter::pwm_min),
             static_cast<double>(MotorParameter::pwm_max));
-    actuation_command_.motor_right_pwm = clamp(right_motor_output,
+    actuation_command_.motor_right_pwm = clamp(abs(right_motor_output),
             static_cast<double>(MotorParameter::pwm_min),
             static_cast<double>(MotorParameter::pwm_max));
 }
