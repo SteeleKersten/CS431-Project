@@ -313,6 +313,10 @@ pushButtonAInterruptHandler(void* arg)
      *
      *  TODO LAB 8 YOUR CODE HERE.
      */
+    if (planner_)
+    {
+        planner_->start();
+    }
 }
 
 void IRAM_ATTR
