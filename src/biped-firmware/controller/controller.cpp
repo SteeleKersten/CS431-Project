@@ -86,8 +86,8 @@ Controller::Controller() : active_(false), output_position_x_(0), output_attitud
      */
     controller_parameter_.pid_controller_gain_position_x.proportional = 2000;
     controller_parameter_.pid_controller_gain_position_x.differential = 1500;
-    controller_parameter_.pid_controller_gain_position_x.integral = 0;
-    controller_parameter_.pid_controller_gain_position_x.integral_max = 0;
+    controller_parameter_.pid_controller_gain_position_x.integral = 1000;
+    controller_parameter_.pid_controller_gain_position_x.integral_max = 100;
 
     /*
      *  Set entries in the Y attitude (pitch) PID controller gain struct in
@@ -186,9 +186,9 @@ Controller::Controller() : active_(false), output_position_x_(0), output_attitud
      *
      *  TODO LAB 8 YOUR CODE HERE.
      */
-    controller_parameter_.attitude_z_gain_open_loop = 0;
+    controller_parameter_.attitude_z_gain_open_loop = 500;
     controller_parameter_.pid_controller_gain_attitude_z.proportional = 0;
-    controller_parameter_.pid_controller_gain_attitude_z.differential = 0;
+    controller_parameter_.pid_controller_gain_attitude_z.differential = -100;
     controller_parameter_.pid_controller_gain_attitude_z.integral = 0;
     controller_parameter_.pid_controller_gain_attitude_z.integral_max = 0;
 
@@ -225,10 +225,8 @@ Controller::Controller() : active_(false), output_position_x_(0), output_attitud
      *
      *  TODO LAB 8 YOUR CODE HERE.
      */
-    controller_parameter_.pid_controller_saturation_position_x.input_lower = std::numeric_limits<
-            double>::lowest();
-    controller_parameter_.pid_controller_saturation_position_x.input_upper = std::numeric_limits<
-            double>::max();
+    controller_parameter_.pid_controller_saturation_position_x.input_lower = -0.1;
+    controller_parameter_.pid_controller_saturation_position_x.input_upper = 0.1;
 
     /*
      *  Using the setControllerParameter class member function, set the
@@ -542,7 +540,7 @@ Controller::control(const bool& fast_domain)
          *
          *  TODO LAB 7 YOUR CODE HERE.
          */
-        output_attitude_z_ = open_loop_controller_attitude_z_.control() * enc_data.velocity_x
+        output_attitude_z_ = open_loop_controller_attitude_z_.control() * abs(enc_data.velocity_x)
                 + pid_controller_attitude_z_.control();
     }
 
