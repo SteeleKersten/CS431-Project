@@ -192,6 +192,10 @@ bestEffortTask()
      *
      *  TODO LAB 8 YOUR CODE HERE.
      */
+    if (planner_)
+    {
+        planner_stage = planner_->plan();
+    }
 
     /*
      *  If the planner stage local variable is less than 0, using the Display class in the display header,
