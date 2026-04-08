@@ -125,6 +125,13 @@ ManeuverPlanner::start()
      *
      *  TODO LAB 8 YOUR CODE HERE.
      */
+    if (plan_completed_){
+        maneuver_ = ;
+        maneuver_counter_ = 1;
+        maneuver_ = !maneuver_start_;
+        plan_started_ = false;
+        plan_completed_ = false;
+    }
 }
 
 int
@@ -154,7 +161,9 @@ ManeuverPlanner::plan()
      *
      *  TODO LAB 8 YOUR CODE HERE.
      */
-
+    if (plan_completed_ || !controller_){
+        return -1;
+    }
     /*
      *  Detect plan completion.
      */
@@ -170,6 +179,11 @@ ManeuverPlanner::plan()
          *
          *  TODO LAB 8 YOUR CODE HERE.
          */
+        plan_started_ = false;
+        plan_completed_ = true;
+        if ((plan_started_ && !plan_completed_) && maneuver_ == NULL){
+            return -1;
+        }
     }
 
     if (!plan_started_)
