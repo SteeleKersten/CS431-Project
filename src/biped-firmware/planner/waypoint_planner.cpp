@@ -112,6 +112,33 @@ WaypointPlanner::WaypointPlanner() : waypoint_counter_(1), waypoint_timer_(0), p
      *
      *  TODO LAB 9 YOUR CODE HERE.
      */
+    
+    // Custom Lab 9 plan: A simple triangular movement pattern.
+    // This plan demonstrates basic waypoint navigation with varied angles.
+    std::shared_ptr<Waypoint> custom_wp1 = std::make_shared<Waypoint>();
+    std::shared_ptr<Waypoint> custom_wp2 = std::make_shared<Waypoint>();
+    std::shared_ptr<Waypoint> custom_wp3 = std::make_shared<Waypoint>();
+
+    waypoint_start_ = custom_wp1;
+    waypoint_ = waypoint_start_;
+
+    // Waypoint 1: Move to 0.3m forward, no turn, 4 seconds
+    custom_wp1->controller_reference.attitude_z = degreesToRadians(0);
+    custom_wp1->controller_reference.position_x = 0.3;
+    custom_wp1->duration = 4;
+    custom_wp1->next = custom_wp2;
+
+    // Waypoint 2: Move to 0.7m forward, turn right 30 degrees, 8 seconds
+    custom_wp2->controller_reference.attitude_z = degreesToRadians(30);
+    custom_wp2->controller_reference.position_x = 0.7;
+    custom_wp2->duration = 8;
+    custom_wp2->next = custom_wp3;
+
+    // Waypoint 3: Return to 0.3m, turn left 30 degrees, 8 seconds (end)
+    custom_wp3->controller_reference.attitude_z = degreesToRadians(-30);
+    custom_wp3->controller_reference.position_x = 0.3;
+    custom_wp3->duration = 8;
+    custom_wp3->next = nullptr;
 }
 
 void IRAM_ATTR

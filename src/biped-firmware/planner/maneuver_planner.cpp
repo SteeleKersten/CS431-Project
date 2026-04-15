@@ -112,6 +112,48 @@ ManeuverPlanner::ManeuverPlanner() : maneuver_counter_(1), maneuver_timer_(0), p
      *
      *  TODO LAB 9 YOUR CODE HERE.
      */
+    
+    // Custom Lab 9 plan: A simple park-drive-park-turn sequence.
+    // This plan demonstrates basic maneuver chaining without excessive complexity.
+    std::shared_ptr<Maneuver> custom_1 = std::make_shared<Maneuver>();
+    std::shared_ptr<Maneuver> custom_2 = std::make_shared<Maneuver>();
+    std::shared_ptr<Maneuver> custom_3 = std::make_shared<Maneuver>();
+    std::shared_ptr<Maneuver> custom_4 = std::make_shared<Maneuver>();
+    std::shared_ptr<Maneuver> custom_5 = std::make_shared<Maneuver>();
+
+    maneuver_start_ = custom_1;
+    maneuver_ = maneuver_start_;
+
+    // Step 1: Park for 1 second to initialize
+    custom_1->transition_type = Maneuver::TransitionType::duration;
+    custom_1->transition_value = 1;
+    custom_1->type = Maneuver::Type::park;
+    custom_1->next = custom_2;
+
+    // Step 2: Drive forward until reaching 0.5m position
+    custom_2->transition_type = Maneuver::TransitionType::position_x_above;
+    custom_2->transition_value = 0.5;
+    custom_2->type = Maneuver::Type::drive;
+    custom_2->next = custom_3;
+
+    // Step 3: Park for 1 second
+    custom_3->transition_type = Maneuver::TransitionType::duration;
+    custom_3->transition_value = 1;
+    custom_3->type = Maneuver::Type::park;
+    custom_3->next = custom_4;
+
+    // Step 4: Drive left 45 degrees while moving forward
+    custom_4->transition_type = Maneuver::TransitionType::duration;
+    custom_4->transition_value = 3;
+    custom_4->type = Maneuver::Type::drive_left;
+    custom_4->next = custom_5;
+
+    // Step 5: Park for 1 second (end)
+    custom_5->transition_type = Maneuver::TransitionType::duration;
+    custom_5->transition_value = 1;
+    custom_5->type = Maneuver::Type::park;
+    custom_5->next = nullptr;
+    
 }
 
 void IRAM_ATTR
