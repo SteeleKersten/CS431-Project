@@ -83,6 +83,8 @@ sock.bind(("0.0.0.0", 4432))
 sock.settimeout(0.01)
 
 command_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+command_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+command_sock.bind(("0.0.0.0", 4431))
 
 buffer = b''
 MAX_BUFFER = 200000
@@ -210,7 +212,7 @@ if run_stream:
                             or current_time - last_command_time >= COMMAND_INTERVAL_SECONDS
                         ):
                             print(f"sending: {command_to_send}")
-                            command_sock.sendto(command_to_send.encode("utf-8"), (ESP32_IP, COMMAND_PORT))
+                            command_sock.sendto(command_to_send.encode('utf-8'), (ESP32_IP, COMMAND_PORT))
                             last_command = command_to_send
                             last_command_time = current_time
 

@@ -40,6 +40,7 @@
 #include "task/interrupt.h"
 #include "task/task.h"
 
+
 /*
  *  Biped namespace.
  */
@@ -58,23 +59,27 @@ normalizeMessage(const std::string& message)
     std::size_t start = 0;
     std::size_t end = message.size();
 
-    while (start < end && std::isspace(static_cast<unsigned char>(message[start])))
+    while (start < end && message[start] != 'g')
     {
         ++start;
     }
 
-    while (end > start && std::isspace(static_cast<unsigned char>(message[end - 1])))
-    {
-        --end;
+
+    std::string substr_message = message.substr(start, 20);
+
+    // for (char& character : normalized)
+    // {
+    //     character = static_cast<char>(std::tolower(static_cast<unsigned char>(character)));
+    // }
+    std::string normalized;
+    for (char c : substr_message){
+        if (c == '0') {
+            normalized += '\0';
+            break;
+        }
+        normalized += c;
     }
-
-    std::string normalized = message.substr(start, end - start);
-
-    for (char& character : normalized)
-    {
-        character = static_cast<char>(std::tolower(static_cast<unsigned char>(character)));
-    }
-
+    Serial(LogLevel::info) << normalized;
     return normalized;
 }
 
@@ -85,9 +90,9 @@ handleGestureMessage(const std::string& message)
     {
         return false;
     }
-
+    
     std::string normalized = normalizeMessage(message);
-
+    
     if (normalized.rfind("gesture:", 0) == 0)
     {
         normalized = normalized.substr(8);
@@ -122,7 +127,7 @@ handleGestureMessage(const std::string& message)
     {
         gesture_command = false;
     }
-
+    
     if (!gesture_command)
     {
         return false;
@@ -810,6 +815,7 @@ udpReadBipedMessageTask(void* pvParameters)
          */
         if (handleGestureMessage(message))
         {
+            
             continue;
         }
 
