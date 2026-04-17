@@ -87,7 +87,7 @@ command_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 buffer = b''
 MAX_BUFFER = 200000
 
-ESP32_IP = "192.168.1.20"  # change if needed
+ESP32_IP = "192.168.1.27"  # change if needed
 COMMAND_PORT = 4431
 COMMAND_INTERVAL_SECONDS = 0.15
 NO_HAND_STOP_SECONDS = 0.5
@@ -102,7 +102,7 @@ def gesture_to_command(handedness_label, gesture):
         return "right" if handedness_label == "Right" else "left"
     if gesture in ("Open Palm", "Fist"):
         return "stop"
-    return None
+    return "no hand"
 
 # -----------------------------
 # Main loop
@@ -130,7 +130,7 @@ if run_stream:
                     continue
 
                 buffer += data
-
+                #print(len(buffer))
                 if len(buffer) > MAX_BUFFER:
                     print("overflow")
                     buffer = b''
@@ -168,7 +168,9 @@ if run_stream:
                                 gesture = classify_gesture(hand_landmarks, handedness_label)
                                 detected_labels.append(f"{handedness_label}: {gesture}")
                                 if command_to_send is None:
-                                    command_to_send = gesture_to_command(handedness_label, gesture)
+                                    gesture_to_send = gesture_to_command(handedness_label, gesture)
+                                    if gesture_to_send is not None:
+                                        command_to_send = "gesture:" + gesture_to_send
 
                                 if show_landmarks:
                                     mp_drawing.draw_landmarks(
@@ -201,12 +203,13 @@ if run_stream:
                         if command_to_send is not None:
                             last_detection_time = current_time
                         elif current_time - last_detection_time >= NO_HAND_STOP_SECONDS:
-                            command_to_send = "stop"
-
+                            command_to_send = "gesture:stop"
+                       
                         if command_to_send is not None and (
                             command_to_send != last_command
                             or current_time - last_command_time >= COMMAND_INTERVAL_SECONDS
                         ):
+                            print(f"sending: {command_to_send}")
                             command_sock.sendto(command_to_send.encode("utf-8"), (ESP32_IP, COMMAND_PORT))
                             last_command = command_to_send
                             last_command_time = current_time
@@ -224,7 +227,7 @@ if run_stream:
                         frame_placeholder.image(
                             cv2.cvtColor(frame, cv2.COLOR_BGR2RGB),
                             channels="RGB",
-                            use_container_width=True
+                            width='stretch'
                         )
 
                     else:
