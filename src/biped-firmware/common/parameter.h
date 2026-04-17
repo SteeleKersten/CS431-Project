@@ -150,7 +150,7 @@ namespace NetworkParameter
 constexpr size_t buffer_size_biped_message = 1024; //!< Biped message buffer size.
 constexpr size_t buffer_size_camera = 1460; //!< Camera buffer size.
 constexpr char camera_frame_boundary[] = "123456789000000000000987654321"; //!< Camera frame magic boundary string.
-constexpr char ip_ground_station[] = "192.168.1.13";   //!< Biped ground station IP address.
+constexpr char ip_ground_station[] = "192.168.1.14";   //!< Biped ground station IP address.
 constexpr char passphrase[] = "s4srxcF3";   //!< Wi-Fi passphrase.
 constexpr uint16_t port_udp_biped_message = 4431;  //!< Biped message UDP port.
 constexpr uint16_t port_udp_camera = 4432;  //!< Camera UDP port.
@@ -193,7 +193,7 @@ namespace TaskParameter
 {
 constexpr int core_0 = 0;   //!< CPU core 0.
 constexpr int core_1 = 1;   //!< CPU core 1.
-constexpr unsigned int priority_min = 0;    //!< Minimum priority.
+constexpr unsigned int priority_min = 1;    //!< Minimum priority.
 constexpr unsigned int priority_max = configMAX_PRIORITIES; //!< Maximum priority.
 constexpr uint32_t stack_size = 4096;   //!< Task stack size, in bytes.
 }   // namespace TaskParameter

@@ -85,8 +85,8 @@ Controller::Controller() : active_(false), output_position_x_(0), output_attitud
      *  TODO LAB 7 YOUR CODE HERE.
      */
     controller_parameter_.pid_controller_gain_position_x.proportional = 2000;
-    controller_parameter_.pid_controller_gain_position_x.differential = 1500;
-    controller_parameter_.pid_controller_gain_position_x.integral = 1000;
+    controller_parameter_.pid_controller_gain_position_x.differential = 1480;
+    controller_parameter_.pid_controller_gain_position_x.integral = 0;
     controller_parameter_.pid_controller_gain_position_x.integral_max = 100;
 
     /*
@@ -147,8 +147,8 @@ Controller::Controller() : active_(false), output_position_x_(0), output_attitud
      *
      *  TODO LAB 7 YOUR CODE HERE.
      */
-    controller_parameter_.pid_controller_gain_attitude_y.proportional = -5000;
-    controller_parameter_.pid_controller_gain_attitude_y.differential = -100;
+    controller_parameter_.pid_controller_gain_attitude_y.proportional = -3150;
+    controller_parameter_.pid_controller_gain_attitude_y.differential = -50;
     controller_parameter_.pid_controller_gain_attitude_y.integral = 0;
     controller_parameter_.pid_controller_gain_attitude_y.integral_max = 0;
 
@@ -186,9 +186,9 @@ Controller::Controller() : active_(false), output_position_x_(0), output_attitud
      *
      *  TODO LAB 8 YOUR CODE HERE.
      */
-    controller_parameter_.attitude_z_gain_open_loop = 500;
+    controller_parameter_.attitude_z_gain_open_loop = 95;
     controller_parameter_.pid_controller_gain_attitude_z.proportional = 0;
-    controller_parameter_.pid_controller_gain_attitude_z.differential = -100;
+    controller_parameter_.pid_controller_gain_attitude_z.differential = -55;
     controller_parameter_.pid_controller_gain_attitude_z.integral = 0;
     controller_parameter_.pid_controller_gain_attitude_z.integral_max = 0;
 

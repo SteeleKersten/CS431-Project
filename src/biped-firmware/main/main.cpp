@@ -118,7 +118,44 @@ setup()
      *
      *  Refer to the global header for the Biped serial number global variable,
      *  the Arduino EEPROM header for reading from EEPROM, and the parameter
-     *  header for the Biped serial number EEPROM address.
+     *  header for the Biped serial number EEtd::shared_ptr<Maneuver> custom_1 = std::make_shared<Maneuver>();
+//    std::shared_ptr<Maneuver> custom_2 = std::make_shared<Maneuver>();
+//    std::shared_ptr<Maneuver> custom_3 = std::make_shared<Maneuver>();
+//    std::shared_ptr<Maneuver> custom_4 = std::make_shared<Maneuver>();
+//    std::shared_ptr<Maneuver> custom_5 = std::make_shared<Maneuver>();
+//
+//    maneuver_start_ = custom_1;
+//    maneuver_ = maneuver_start_;
+//
+//    // Step 1: Park for 1 second to initialize
+//    custom_1->transition_type = Maneuver::TransitionType::duration;
+//    custom_1->transition_value = 1;
+//    custom_1->type = Maneuver::Type::park;
+//    custom_1->next = custom_2;
+//
+//    // Step 2: Drive forward until reaching 0.5m position
+//    custom_2->transition_type = Maneuver::TransitionType::position_x_above;
+//    custom_2->transition_value = 0.5;
+//    custom_2->type = Maneuver::Type::drive;
+//    custom_2->next = custom_3;
+//
+//    // Step 3: Park for 1 second
+//    custom_3->transition_type = Maneuver::TransitionType::duration;
+//    custom_3->transition_value = 1;
+//    custom_3->type = Maneuver::Type::park;
+//    custom_3->next = custom_4;
+//
+//    // Step 4: Drive left 45 degrees while moving forward
+//    custom_4->transition_type = Maneuver::TransitionType::duration;
+//    custom_4->transition_value = 3;
+//    custom_4->type = Maneuver::Type::drive_left;
+//    custom_4->next = custom_5;
+//
+//    // Step 5: Park for 1 second (end)
+//    custom_5->transition_type = Maneuver::TransitionType::duration;
+//    custom_5->transition_value = 1;
+//    custom_5->type = Maneuver::Type::park;
+//    custom_5->next = nullptr;PROM address.
      *
      *  TODO LAB 1 YOUR CODE HERE.
      */
@@ -228,7 +265,7 @@ setup()
      *
      *  TODO LAB 8 YOUR CODE HERE.
      */
-    planner_ = std::make_shared<ManeuverPlanner>();
+    planner_ = std::make_shared<ManeuverPlanner>(); ///////////////////////////////////////////////////////////////////////////////////////////////
 //    planner_ = std::make_shared<WaypointPlanner>();
 
     /*
