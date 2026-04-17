@@ -3,6 +3,7 @@ import mediapipe as mp
 import streamlit as st
 import socket
 import numpy as np
+import time
 
 # -----------------------------
 # Streamlit page setup
@@ -81,16 +82,36 @@ sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 sock.bind(("0.0.0.0", 4432))
 sock.settimeout(0.01)
 
+command_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
 buffer = b''
 MAX_BUFFER = 200000
 
 ESP32_IP = "192.168.1.20"  # change if needed
+COMMAND_PORT = 4431
+COMMAND_INTERVAL_SECONDS = 0.15
+NO_HAND_STOP_SECONDS = 0.5
+
+
+def gesture_to_command(handedness_label, gesture):
+    if gesture == "Thumbs Up":
+        return "forward"
+    if gesture == "Peace":
+        return "backward"
+    if gesture == "Pointing":
+        return "right" if handedness_label == "Right" else "left"
+    if gesture in ("Open Palm", "Fist"):
+        return "stop"
+    return None
 
 # -----------------------------
 # Main loop
 # -----------------------------
 if run_stream:
     st.info("Receiving ESP32 stream...")
+    last_command = None
+    last_command_time = 0.0
+    last_detection_time = 0.0
 
     with mp_hands.Hands(
         static_image_mode=False,
@@ -136,6 +157,7 @@ if run_stream:
 
                         results = hands.process(rgb)
                         detected_labels = []
+                        command_to_send = None
 
                         if results.multi_hand_landmarks and results.multi_handedness:
                             for hand_landmarks, handedness in zip(
@@ -145,6 +167,8 @@ if run_stream:
                                 handedness_label = handedness.classification[0].label
                                 gesture = classify_gesture(hand_landmarks, handedness_label)
                                 detected_labels.append(f"{handedness_label}: {gesture}")
+                                if command_to_send is None:
+                                    command_to_send = gesture_to_command(handedness_label, gesture)
 
                                 if show_landmarks:
                                     mp_drawing.draw_landmarks(
@@ -172,13 +196,30 @@ if run_stream:
                                     2
                                 )
 
+                        current_time = time.time()
+
+                        if command_to_send is not None:
+                            last_detection_time = current_time
+                        elif current_time - last_detection_time >= NO_HAND_STOP_SECONDS:
+                            command_to_send = "stop"
+
+                        if command_to_send is not None and (
+                            command_to_send != last_command
+                            or current_time - last_command_time >= COMMAND_INTERVAL_SECONDS
+                        ):
+                            command_sock.sendto(command_to_send.encode("utf-8"), (ESP32_IP, COMMAND_PORT))
+                            last_command = command_to_send
+                            last_command_time = current_time
+
                         # -----------------------------
                         # Display
                         # -----------------------------
                         if detected_labels:
-                            label_placeholder.success(" | ".join(detected_labels))
+                            label_placeholder.success(
+                                f"{' | '.join(detected_labels)} | command: {command_to_send or last_command or 'none'}"
+                            )
                         else:
-                            label_placeholder.info("No hand detected")
+                            label_placeholder.info(f"No hand detected | command: {command_to_send or last_command or 'none'}")
 
                         frame_placeholder.image(
                             cv2.cvtColor(frame, cv2.COLOR_BGR2RGB),

@@ -11,6 +11,7 @@
  *  External headers.
  */
 #include <Esp.h>
+#include <cctype>
 #include <esp32-hal-gpio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -49,6 +50,89 @@ namespace biped
  */
 namespace firmware
 {
+namespace
+{
+std::string
+normalizeMessage(const std::string& message)
+{
+    std::size_t start = 0;
+    std::size_t end = message.size();
+
+    while (start < end && std::isspace(static_cast<unsigned char>(message[start])))
+    {
+        ++start;
+    }
+
+    while (end > start && std::isspace(static_cast<unsigned char>(message[end - 1])))
+    {
+        --end;
+    }
+
+    std::string normalized = message.substr(start, end - start);
+
+    for (char& character : normalized)
+    {
+        character = static_cast<char>(std::tolower(static_cast<unsigned char>(character)));
+    }
+
+    return normalized;
+}
+
+bool
+handleGestureMessage(const std::string& message)
+{
+    if (controller_ == nullptr)
+    {
+        return false;
+    }
+
+    std::string normalized = normalizeMessage(message);
+
+    if (normalized.rfind("gesture:", 0) == 0)
+    {
+        normalized = normalized.substr(8);
+    }
+
+    ControllerReference controller_reference = controller_->getControllerReference();
+    bool gesture_command = true;
+
+    if (normalized == "forward" || normalized == "thumbs up")
+    {
+        controller_reference.position_x += 0.1;
+    }
+    else if (normalized == "backward" || normalized == "peace")
+    {
+        controller_reference.position_x -= 0.1;
+    }
+    else if (normalized == "left" || normalized == "left: pointing")
+    {
+        controller_reference.attitude_z += 0.15;
+    }
+    else if (normalized == "right" || normalized == "right: pointing")
+    {
+        controller_reference.attitude_z -= 0.15;
+    }
+    else if (normalized == "stop" || normalized == "open palm" || normalized == "fist"
+            || normalized == "no hand")
+    {
+        controller_reference.position_x = 0.0;
+        controller_reference.attitude_z = 0.0;
+    }
+    else
+    {
+        gesture_command = false;
+    }
+
+    if (!gesture_command)
+    {
+        return false;
+    }
+
+    controller_->setControllerReference(controller_reference);
+    return true;
+}
+}  // namespace
+
 void
 bestEffortTask()
 {
@@ -716,6 +800,15 @@ udpReadBipedMessageTask(void* pvParameters)
          *  TODO LAB 5 YOUR CODE HERE.
          */
         if (message.empty())
+        {
+            continue;
+        }
+
+        /*
+         *  Support raw gesture commands from the CV backend in addition to serialized
+         *  Biped messages. If a gesture string is handled here, skip deserialization.
+         */
+        if (handleGestureMessage(message))
         {
             continue;
         }
