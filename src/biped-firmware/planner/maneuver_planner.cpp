@@ -36,11 +36,40 @@ ManeuverPlanner::ManeuverPlanner() : maneuver_counter_(1), maneuver_timer_(0), p
      *  In the following configurations, the maneuvers should
      *  be chained up in a linked list fashion.
      */
+
+    maneuver_thumbsup_ = std::make_shared<Maneuver>();
+    maneuver_peace_ = std::make_shared<Maneuver>();
+    maneuver_leftpointing_ = std::make_shared<Maneuver>();
+    maneuver_rightpointing_ = std::make_shared<Maneuver>();
+    park_ = std::make_shared<Maneuver>();
+
+    maneuver_thumbsup_->transition_type = Maneuver::TransitionType::gesture_changed;
+    maneuver_thumbsup_->transition_value = 0;
+    maneuver_thumbsup_->type = Maneuver::Type::drive;
+    maneuver_thumbsup_->next = nullptr;
+
+    maneuver_peace_->transition_type = Maneuver::TransitionType::gesture_changed;
+    maneuver_peace_->transition_value = 0;
+    maneuver_peace_->type = Maneuver::Type::reverse;
+    maneuver_peace_->next = nullptr;
+
+    maneuver_leftpointing_->transition_type = Maneuver::TransitionType::gesture_changed;
+    maneuver_leftpointing_->transition_value = 0;
+    maneuver_leftpointing_->type = Maneuver::Type::drive_left;
+    maneuver_leftpointing_->next = nullptr;
+
+    maneuver_rightpointing_->transition_type = Maneuver::TransitionType::gesture_changed;
+    maneuver_rightpointing_->transition_value = 0;
+    maneuver_rightpointing_->type = Maneuver::Type::drive_left;
+    maneuver_rightpointing_->next = nullptr;
+
+    park_->transition_type = Maneuver::TransitionType::gesture_changed;
+    park_->transition_value = 0;
+    park_->type = Maneuver::Type::park;
+    park_->next = nullptr;
+
     std::shared_ptr<Maneuver> maneuver_1 = std::make_shared<Maneuver>();
-    std::shared_ptr<Maneuver> maneuver_2 = std::make_shared<Maneuver>();
-    std::shared_ptr<Maneuver> maneuver_3 = std::make_shared<Maneuver>();
-    std::shared_ptr<Maneuver> maneuver_4 = std::make_shared<Maneuver>();
-    std::shared_ptr<Maneuver> maneuver_5 = std::make_shared<Maneuver>();
+
 
     /*
      *  Set the start and current maneuvers.
@@ -56,47 +85,20 @@ ManeuverPlanner::ManeuverPlanner() : maneuver_counter_(1), maneuver_timer_(0), p
     maneuver_1->transition_type = Maneuver::TransitionType::duration;
     maneuver_1->transition_value = 2;
     maneuver_1->type = Maneuver::Type::park;
-    maneuver_1->next = maneuver_2;
+    maneuver_1->next = park_;
 
     /*
      *  Example plan maneuver 2 configuration:
      *      - Drive forward until the X position goes above 1 meter.
      *      - Then, start maneuver 3.
      */
-    maneuver_2->transition_type = Maneuver::TransitionType::position_x_above;
-    maneuver_2->transition_value = 1;
-    maneuver_2->type = Maneuver::Type::drive;
-    maneuver_2->next = maneuver_3;
+    
 
     /*
      *  Example plan maneuver 3 configuration:
      *      - Park for 2 seconds.
      *      - Then, start maneuver 4.
      */
-    maneuver_3->transition_type = Maneuver::TransitionType::duration;
-    maneuver_3->transition_value = 2;
-    maneuver_3->type = Maneuver::Type::park;
-    maneuver_3->next = maneuver_4;
-
-    /*
-     *  Example plan maneuver 4 configuration:
-     *      - Drive right until the X position goes above 2 meters.
-     *      - Then, start maneuver 5.
-     */
-    maneuver_4->transition_type = Maneuver::TransitionType::position_x_above;
-    maneuver_4->transition_value = 2;
-    maneuver_4->type = Maneuver::Type::drive_right;
-    maneuver_4->next = maneuver_5;
-
-    /*
-     *  Example plan maneuver 5 configuration:
-     *      - Park for 2 seconds.
-     *      - The end.
-     */
-    maneuver_5->transition_type = Maneuver::TransitionType::duration;
-    maneuver_5->transition_value = 2;
-    maneuver_5->type = Maneuver::Type::park;
-    maneuver_5->next = nullptr;
 
     /*
      *  Using the example plan above, create your own maneuver-based plan.
@@ -112,76 +114,66 @@ ManeuverPlanner::ManeuverPlanner() : maneuver_counter_(1), maneuver_timer_(0), p
      *
      *  TODO LAB 9 YOUR CODE HERE.
      */
-    
-    // Custom Lab 9 plan: Obstacle avoidance using time-of-flight sensors.
-    // This plan drives forward while checking for obstacles within 10cm.
-    // If obstacle detected on left sensor: reverse and turn right to avoid.
-    // If obstacle detected on right sensor: reverse and turn left to avoid.
-    // If obstacle detected on middle sensor: reverse straight back to avoid.
-    // After avoidance, continue driving and checking.
-    // Finally park after completing the sequence.
 
-    std::shared_ptr<Maneuver> drive_check_left = std::make_shared<Maneuver>();
-    std::shared_ptr<Maneuver> avoid_left = std::make_shared<Maneuver>();
-    std::shared_ptr<Maneuver> drive_check_right = std::make_shared<Maneuver>();
-    std::shared_ptr<Maneuver> avoid_right = std::make_shared<Maneuver>();
-    std::shared_ptr<Maneuver> drive_check_middle = std::make_shared<Maneuver>();
-    std::shared_ptr<Maneuver> avoid_middle = std::make_shared<Maneuver>();
-    std::shared_ptr<Maneuver> park_end = std::make_shared<Maneuver>();
-
-    maneuver_start_ = drive_check_left;
-    maneuver_ = maneuver_start_;
-
-    // Drive forward, check for left obstacle
-    drive_check_left->transition_type = Maneuver::TransitionType::range_left_below;
-    drive_check_left->transition_value = 0.1;  // 10cm
-    drive_check_left->type = Maneuver::Type::drive;
-    drive_check_left->next = avoid_left;
-
-    // If left obstacle detected, reverse and turn right for 2 seconds
-    avoid_left->transition_type = Maneuver::TransitionType::duration;
-    avoid_left->transition_value = 2;
-    avoid_left->type = Maneuver::Type::reverse_right;
-    avoid_left->next = drive_check_right;
-
-    // Continue driving, check for right obstacle
-    drive_check_right->transition_type = Maneuver::TransitionType::range_right_below;
-    drive_check_right->transition_value = 0.1;  // 10cm
-    drive_check_right->type = Maneuver::Type::drive;
-    drive_check_right->next = avoid_right;
-
-    // If right obstacle detected, reverse and turn left for 2 seconds
-    avoid_right->transition_type = Maneuver::TransitionType::duration;
-    avoid_right->transition_value = 2;
-    avoid_right->type = Maneuver::Type::reverse_left;
-    avoid_right->next = drive_check_middle;
-
-    // Continue driving, check for middle obstacle
-    drive_check_middle->transition_type = Maneuver::TransitionType::range_middle_below;
-    drive_check_middle->transition_value = 0.1;  // 10cm
-    drive_check_middle->type = Maneuver::Type::drive;
-    drive_check_middle->next = avoid_middle;
-
-    // If middle obstacle detected, reverse straight back for 2 seconds
-    avoid_middle->transition_type = Maneuver::TransitionType::duration;
-    avoid_middle->transition_value = 2;
-    avoid_middle->type = Maneuver::Type::reverse;
-    avoid_middle->next = park_end;
-
-    // Final park
-    park_end->transition_type = Maneuver::TransitionType::duration;
-    park_end->transition_value = 1;
-    park_end->type = Maneuver::Type::park;
-    park_end->next = nullptr;
-
-    // Assign to class members
-    avoid_left_ = avoid_left;
-    avoid_right_ = avoid_right;
-    avoid_middle_ = avoid_middle;
-    drive_check_left_ = drive_check_left;
-    drive_check_right_ = drive_check_right;
-    drive_check_middle_ = drive_check_middle;
-    park_end_ = park_end;
+//    maneuver_1->transition_type = Maneuver::TransitionType::duration;
+//    maneuver_1->transition_value = 2;
+//    maneuver_1->type = Maneuver::Type::park;
+//    maneuver_1->next = maneuver_2;
+//
+//    /*
+//     *  Example plan maneuver 2 configuration:
+//     *      - Drive forward until the X position goes above 1 meter.
+//     *      - Then, start maneuver 3.
+//     */
+//    maneuver_2->transition_type = Maneuver::TransitionType::range_middle_below;
+//    maneuver_2->transition_value = 0.6;
+//    maneuver_2->type = Maneuver::Type::drive;
+//    maneuver_2->next = maneuver_3;
+//
+//    maneuver_3->transition_type = Maneuver::TransitionType::duration;
+//    maneuver_3->transition_value = 2;
+//    maneuver_3->type = Maneuver::Type::park;
+//    maneuver_3->next = maneuver_4;
+//
+//
+//    /*
+//     *  Example plan maneuver 3 configuration:
+//     *      - Park for 2 seconds.
+//     *      - Then, start maneuver 4.
+//     */
+//    maneuver_4->transition_type = Maneuver::TransitionType::duration;
+//    maneuver_4->transition_value = 5;
+//    maneuver_4->type = Maneuver::Type::drive_left;
+//    maneuver_4->next = maneuver_5;
+//
+//    maneuver_5->transition_type = Maneuver::TransitionType::duration;
+//    maneuver_5->transition_value = 2;
+//    maneuver_5->type = Maneuver::Type::park;
+//    maneuver_5->next = maneuver_6;
+//    /*
+//     *  Example plan maneuver 4 configuration:
+//     *      - Drive right until the X position goes above 2 meters.
+//     *      - Then, start maneuver 5.
+//     */
+//    maneuver_6->transition_type = Maneuver::TransitionType::duration;
+//    maneuver_6->transition_value = 2;
+//    maneuver_6->type = Maneuver::Type::drive_right;
+//    maneuver_6->next = maneuver_7;
+//
+//    /*
+//     *  Example plan maneuver 5 configuration:
+//     *      - Park for 2 seconds.
+//     *      - The end.
+//     */
+//    maneuver_7->transition_type = Maneuver::TransitionType::position_x_above;
+//    maneuver_7->transition_value = 4;
+//    maneuver_7->type = Maneuver::Type::drive;
+//    maneuver_7->next = maneuver_8;
+//
+//    maneuver_8->transition_type = Maneuver::TransitionType::duration;
+//    maneuver_8->transition_value = 2;
+//    maneuver_8->type = Maneuver::Type::park;
+//    maneuver_8->next = nullptr;
 }
 
 void IRAM_ATTR
@@ -195,13 +187,14 @@ ManeuverPlanner::start()
      *
      *  TODO LAB 8 YOUR CODE HERE.
      */
-    if (plan_completed_){
+    if (plan_completed_) {
         maneuver_ = maneuver_start_;
         maneuver_counter_ = 1;
-        maneuver_started_ = false;
-        plan_started_ = false;
-        plan_completed_ = false;
+        maneuver_started_ = 0;
+        plan_started_ = 0;
+        plan_completed_ = 0;
     }
+
 }
 
 int
@@ -231,7 +224,7 @@ ManeuverPlanner::plan()
      *
      *  TODO LAB 8 YOUR CODE HERE.
      */
-    if (plan_completed_ || !controller_->getActiveStatus()){
+    if (plan_completed_ || !controller_->getActiveStatus()) {
         return -1;
     }
     /*
@@ -249,11 +242,9 @@ ManeuverPlanner::plan()
          *
          *  TODO LAB 8 YOUR CODE HERE.
          */
-        plan_started_ = false;
-        plan_completed_ = true;
-        if ((plan_started_ && !plan_completed_) && maneuver_ == nullptr){
-            return -1;
-        }
+        plan_started_ = 0;
+        plan_completed_ = 1;
+        return -1;
     }
 
     if (!plan_started_)
@@ -294,44 +285,17 @@ ManeuverPlanner::plan()
          *
          *  TODO LAB 8 YOUR CODE HERE.
          */
-        controller_->setControllerReference(generateControllerReference());
         maneuver_timer_ = millis();
-        maneuver_started_ = true;
+        controller_->setControllerReference(generateControllerReference());
+        maneuver_started_ = 1;
     }
     else
     {
         /*
-         *  Check for obstacles and transition to avoidance maneuvers if detected.
+         *  Transition to the next maneuver based on the current maneuver
+         *  transition type and value.
          */
-        TimeOfFlightData tof_data = sensor_->getTimeOfFlightData();
-        if (tof_data.range_left < 0.1 && maneuver_ != avoid_left_)
-        {
-            maneuver_ = avoid_left_;
-            ++maneuver_counter_;
-            maneuver_started_ = false;
-            return maneuver_counter_;
-        }
-        else if (tof_data.range_right < 0.1 && maneuver_ != avoid_right_)
-        {
-            maneuver_ = avoid_right_;
-            ++maneuver_counter_;
-            maneuver_started_ = false;
-            return maneuver_counter_;
-        }
-        else if (tof_data.range_middle < 0.1 && maneuver_ != avoid_middle_)
-        {
-            maneuver_ = avoid_middle_;
-            ++maneuver_counter_;
-            maneuver_started_ = false;
-            return maneuver_counter_;
-        }
-        else
-        {
-            /*
-             *  Transition to the next maneuver based on the current maneuver
-             *  transition type and value.
-             */
-            switch (maneuver_->transition_type)
+        switch (maneuver_->transition_type)
         {
             case Maneuver::TransitionType::duration:
             {
@@ -351,12 +315,13 @@ ManeuverPlanner::plan()
                  *
                  *  TODO LAB 8 YOUR CODE HERE.
                  */
-
-                if (millis() - maneuver_timer_ > maneuver_->transition_value) {
+//printf("%.2f", secondsToMilliseconds(maneuver_->transition_value));
+                if (millis() - maneuver_timer_ > secondsToMilliseconds(maneuver_->transition_value)) {
                     maneuver_ = maneuver_->next;
-                    ++maneuver_counter_;
-                    maneuver_started_ = false;
+                    maneuver_counter_++;
+                    maneuver_started_ = 0;
                 }
+
                 break;
             }
             case Maneuver::TransitionType::position_x_above:
@@ -374,12 +339,13 @@ ManeuverPlanner::plan()
                  *
                  *  TODO LAB 8 YOUR CODE HERE.
                  */
-                EncoderData enc_data = sensor_->getEncoderData();
-                if (enc_data.position_x > maneuver_->transition_value) {
+                double cur_x = sensor_->getEncoderData().position_x;
+                if (cur_x > maneuver_->transition_value) {
                     maneuver_ = maneuver_->next;
-                    ++maneuver_counter_;
-                    maneuver_started_ = false;
+                    maneuver_counter_++;
+                    maneuver_started_ = 0;
                 }
+
                 break;
             }
             case Maneuver::TransitionType::position_x_below:
@@ -397,12 +363,14 @@ ManeuverPlanner::plan()
                  *
                  *  TODO LAB 8 YOUR CODE HERE.
                  */
-                EncoderData enc_data = sensor_->getEncoderData();
-                if (enc_data.position_x < maneuver_->transition_value) {
+                double cur_x = sensor_->getEncoderData().position_x;
+                if (cur_x < maneuver_->transition_value) {
                     maneuver_ = maneuver_->next;
-                    ++maneuver_counter_;
-                    maneuver_started_ = false;
+                    maneuver_counter_++;
+                    maneuver_started_ = 0;
                 }
+
+
                 break;
             }
             case Maneuver::TransitionType::range_left_above:
@@ -420,12 +388,13 @@ ManeuverPlanner::plan()
                  *
                  *  TODO LAB 8 YOUR CODE HERE.
                  */
-                TimeOfFlightData tof_data = sensor_->getTimeOfFlightData();
-                if (tof_data.range_left > maneuver_->transition_value) {
+                double cur_left = sensor_->getTimeOfFlightData().range_right;
+                if (cur_left > maneuver_->transition_value) {
                     maneuver_ = maneuver_->next;
-                    ++maneuver_counter_;
-                    maneuver_started_ = false;
+                    maneuver_counter_++;
+                    maneuver_started_ = 0;
                 }
+
                 break;
             }
             case Maneuver::TransitionType::range_left_below:
@@ -443,11 +412,11 @@ ManeuverPlanner::plan()
                  *
                  *  TODO LAB 8 YOUR CODE HERE.
                  */
-                TimeOfFlightData tof_data = sensor_->getTimeOfFlightData();
-                if (tof_data.range_left < maneuver_->transition_value) {
+                double cur_left = sensor_->getTimeOfFlightData().range_right;
+                if (cur_left < maneuver_->transition_value) {
                     maneuver_ = maneuver_->next;
-                    ++maneuver_counter_;
-                    maneuver_started_ = false;
+                    maneuver_counter_++;
+                    maneuver_started_ = 0;
                 }
                 break;
             }
@@ -466,12 +435,13 @@ ManeuverPlanner::plan()
                  *
                  *  TODO LAB 8 YOUR CODE HERE.
                  */
-                TimeOfFlightData tof_data = sensor_->getTimeOfFlightData();
-                if (tof_data.range_middle > maneuver_->transition_value) {
+                double cur_mid = sensor_->getTimeOfFlightData().range_middle;
+                if (cur_mid > maneuver_->transition_value) {
                     maneuver_ = maneuver_->next;
-                    ++maneuver_counter_;
-                    maneuver_started_ = false;
+                    maneuver_counter_++;
+                    maneuver_started_ = 0;
                 }
+
                 break;
             }
             case Maneuver::TransitionType::range_middle_below:
@@ -489,12 +459,13 @@ ManeuverPlanner::plan()
                  *
                  *  TODO LAB 8 YOUR CODE HERE.
                  */
-                TimeOfFlightData tof_data = sensor_->getTimeOfFlightData();
-                if (tof_data.range_middle < maneuver_->transition_value) {
+                double cur_mid = sensor_->getTimeOfFlightData().range_middle;
+                if (cur_mid < maneuver_->transition_value) {
                     maneuver_ = maneuver_->next;
-                    ++maneuver_counter_;
-                    maneuver_started_ = false;
+                    maneuver_counter_++;
+                    maneuver_started_ = 0;
                 }
+
                 break;
             }
             case Maneuver::TransitionType::range_right_above:
@@ -512,12 +483,13 @@ ManeuverPlanner::plan()
                  *
                  *  TODO LAB 8 YOUR CODE HERE.
                  */
-                TimeOfFlightData tof_data = sensor_->getTimeOfFlightData();
-                if (tof_data.range_right > maneuver_->transition_value) {
+                double cur_right = sensor_->getTimeOfFlightData().range_right;
+                if (cur_right > maneuver_->transition_value) {
                     maneuver_ = maneuver_->next;
-                    ++maneuver_counter_;
-                    maneuver_started_ = false;
+                    maneuver_counter_++;
+                    maneuver_started_ = 0;
                 }
+
                 break;
             }
             case Maneuver::TransitionType::range_right_below:
@@ -535,13 +507,58 @@ ManeuverPlanner::plan()
                  *
                  *  TODO LAB 8 YOUR CODE HERE.
                  */
-                TimeOfFlightData tof_data = sensor_->getTimeOfFlightData();
-                if (tof_data.range_right < maneuver_->transition_value) {
+                double cur_right = sensor_->getTimeOfFlightData().range_right;
+                if (cur_right < maneuver_->transition_value) {
                     maneuver_ = maneuver_->next;
-                    ++maneuver_counter_;
-                    maneuver_started_ = false;
+                    maneuver_counter_++;
+                    maneuver_started_ = 0;
                 }
+
+
                 break;
+            }
+            case Maneuver::TransitionType::gesture_changed:
+            {
+                if (gesture_recognized_ != last_gesture_recognized) {
+                    switch (gesture_recognized_) {
+                        case 1:
+                        {
+                            maneuver_ = maneuver_thumbsup_;
+                            maneuver_counter_++;
+                            maneuver_started_ = 0;
+                            break;
+                        }
+                        case 2:
+                        {
+                            maneuver_ = maneuver_peace_;
+                            maneuver_counter_++;
+                            maneuver_started_ = 0;
+                            break;
+                        }
+                        case 3:
+                        {
+                            maneuver_ = maneuver_leftpointing_;
+                            maneuver_counter_++;
+                            maneuver_started_ = 0;
+                            break;
+                        }
+                        case 4:
+                        {
+                            maneuver_ = maneuver_rightpointing_;
+                            maneuver_counter_++;
+                            maneuver_started_ = 0;
+                            break;
+                        }
+                        default:
+                        {
+                            maneuver_ = park_;
+                            maneuver_counter_++;
+                            maneuver_started_ = 0;
+                            break;
+                        }
+                    }
+                }
+                last_gesture_recognized = gesture_recognized_;
             }
             default:
             {
@@ -551,7 +568,6 @@ ManeuverPlanner::plan()
                 Serial(LogLevel::warn) << "Unknown maneuver transition type.";
                 break;
             }
-        }
         }
     }
 
@@ -595,8 +611,10 @@ ManeuverPlanner::generateControllerReference() const
              *
              *  TODO LAB 8 YOUR CODE HERE.
              */
-            EncoderData enc_data = sensor_->getEncoderData();
-            controller_reference.position_x = enc_data.position_x;
+            controller_reference = controller_->getControllerReference();
+            controller_reference.position_x = sensor_->getEncoderData().position_x;
+            controller_->setControllerReference(controller_reference);
+
             break;
         }
         case Maneuver::Type::reverse:
@@ -609,8 +627,10 @@ ManeuverPlanner::generateControllerReference() const
              *
              *  TODO LAB 8 YOUR CODE HERE.
              */
-            EncoderData enc_data = sensor_->getEncoderData();
-            controller_reference.position_x = enc_data.position_x - 1000;
+            controller_reference = controller_->getControllerReference();
+            controller_reference.position_x = sensor_->getEncoderData().position_x - 1000;
+            controller_->setControllerReference(controller_reference);
+
             break;
         }
         case Maneuver::Type::reverse_left:
@@ -631,9 +651,11 @@ ManeuverPlanner::generateControllerReference() const
              *
              *  TODO LAB 8 YOUR CODE HERE.
              */
-            EncoderData enc_data = sensor_->getEncoderData();
-            controller_reference.position_x = enc_data.position_x - 1000;
-            controller_reference.attitude_z = degreesToRadians(90);
+            controller_reference = controller_->getControllerReference();
+            controller_reference.position_x = sensor_->getEncoderData().position_x - 1000;
+            controller_reference.attitude_z -= degreesToRadians(90); //unsure
+            controller_->setControllerReference(controller_reference);
+
             break;
         }
         case Maneuver::Type::reverse_right:
@@ -654,9 +676,11 @@ ManeuverPlanner::generateControllerReference() const
              *
              *  TODO LAB 8 YOUR CODE HERE.
              */
-            EncoderData enc_data = sensor_->getEncoderData();
-            controller_reference.position_x = enc_data.position_x - 1000;
-            controller_reference.attitude_z = degreesToRadians(-90);
+            controller_reference = controller_->getControllerReference();
+            controller_reference.position_x = sensor_->getEncoderData().position_x - 1000;
+            controller_reference.attitude_z += degreesToRadians(90); //unsure
+            controller_->setControllerReference(controller_reference);
+
             break;
         }
         case Maneuver::Type::drive:
@@ -669,8 +693,10 @@ ManeuverPlanner::generateControllerReference() const
              *
              *  TODO LAB 8 YOUR CODE HERE.
              */
-            EncoderData enc_data = sensor_->getEncoderData();
-            controller_reference.position_x = enc_data.position_x + 1000;
+            controller_reference = controller_->getControllerReference();
+            controller_reference.position_x = sensor_->getEncoderData().position_x + 1000;
+            controller_->setControllerReference(controller_reference);
+
             break;
         }
         case Maneuver::Type::drive_left:
@@ -687,9 +713,12 @@ ManeuverPlanner::generateControllerReference() const
              *
              *  TODO LAB 8 YOUR CODE HERE.
              */
-            EncoderData enc_data = sensor_->getEncoderData();
-            controller_reference.position_x = enc_data.position_x + 1000;
-            controller_reference.attitude_z = degreesToRadians(-90);
+            controller_reference = controller_->getControllerReference();
+            controller_reference.position_x = sensor_->getEncoderData().position_x + 1000;
+            controller_reference.attitude_z = degreesToRadians(-180);
+            controller_->setControllerReference(controller_reference);
+
+
             break;
         }
         case Maneuver::Type::drive_right:
@@ -706,9 +735,10 @@ ManeuverPlanner::generateControllerReference() const
              *
              *  TODO LAB 8 YOUR CODE HERE.
              */
-            EncoderData enc_data = sensor_->getEncoderData();
-            controller_reference.position_x = enc_data.position_x + 1000;
-            controller_reference.attitude_z = degreesToRadians(90);
+            controller_reference = controller_->getControllerReference();
+            controller_reference.position_x = sensor_->getEncoderData().position_x + 1000;
+            controller_reference.attitude_z = degreesToRadians(180);
+            controller_->setControllerReference(controller_reference);
             break;
         }
         default:

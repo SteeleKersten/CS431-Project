@@ -63,6 +63,7 @@ unsigned long execution_time_real_time_task_ = 0;
 unsigned long interval_real_time_task_ = 0;
 double timer_domain_ = 0;
 
+unsigned int gesture_recognized_ = 0;
 /*
  *  Initialize Biped serial number to 0.
  */

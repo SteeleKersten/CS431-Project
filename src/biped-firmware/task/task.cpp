@@ -79,13 +79,14 @@ normalizeMessage(const std::string& message)
         }
         normalized += c;
     }
-    Serial(LogLevel::info) << normalized;
+    
     return normalized;
 }
 
 bool
 handleGestureMessage(const std::string& message)
 {
+
     if (controller_ == nullptr)
     {
         return false;
@@ -97,31 +98,30 @@ handleGestureMessage(const std::string& message)
     {
         normalized = normalized.substr(8);
     }
-
-    ControllerReference controller_reference = controller_->getControllerReference();
+    //Serial(LogLevel::info) << normalized;
+    //ControllerReference controller_reference = controller_->getControllerReference();
     bool gesture_command = true;
 
     if (normalized == "forward" || normalized == "thumbs up")
     {
-        controller_reference.position_x += 0.1;
+        gesture_recognized_ = 1;
     }
     else if (normalized == "backward" || normalized == "peace")
     {
-        controller_reference.position_x -= 0.1;
+        gesture_recognized_ = 2;
     }
     else if (normalized == "left" || normalized == "left: pointing")
     {
-        controller_reference.attitude_z += 0.15;
+        gesture_recognized_ = 3;
     }
     else if (normalized == "right" || normalized == "right: pointing")
     {
-        controller_reference.attitude_z -= 0.15;
+        gesture_recognized_ = 4;
     }
     else if (normalized == "stop" || normalized == "open palm" || normalized == "fist"
             || normalized == "no hand")
     {
-        controller_reference.position_x = 0.0;
-        controller_reference.attitude_z = 0.0;
+        gesture_recognized_ = 0;
     }
     else
     {
@@ -133,7 +133,7 @@ handleGestureMessage(const std::string& message)
         return false;
     }
 
-    controller_->setControllerReference(controller_reference);
+    //controller_->setControllerReference(controller_reference);
     return true;
 }
 }  // namespace

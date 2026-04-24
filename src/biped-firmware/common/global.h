@@ -78,7 +78,7 @@ extern TaskHandle_t task_handle_udp_write_camera_;    //!< Camera UDP write task
 extern unsigned long execution_time_real_time_task_; //!< Real-time task execution time, in microseconds.
 extern unsigned long interval_real_time_task_;  //!< Real-time task interval, in microseconds.
 extern double timer_domain_;    //!< Period domain timer, in seconds.
-
+extern unsigned int gesture_recognized_;
 extern unsigned serial_number_; //!< Biped serial number.
 }   // namespace firmware
 }   // namespace biped

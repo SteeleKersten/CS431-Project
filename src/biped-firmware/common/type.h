@@ -362,7 +362,8 @@ struct Maneuver
         range_middle_above, //!< Transition if the middle time-of-flight range is above a certain value, in meters.
         range_middle_below, //!< Transition if the middle time-of-flight range is below a certain value, in meters.
         range_right_above, //!< Transition if the right time-of-flight range is above a certain value, in meters.
-        range_right_below //!< Transition if the right time-of-flight range is below a certain value, in meters.
+        range_right_below, //!< Transition if the right time-of-flight range is below a certain value, in meters.
+        gesture_changed
     };
 
     TransitionType transition_type; //!< Maneuver transition type.
