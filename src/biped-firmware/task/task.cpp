@@ -74,7 +74,7 @@ normalizeMessage(const std::string& message)
     std::string normalized;
     for (char c : substr_message){
         if (c == '0') {
-            normalized += '\0';
+        
             break;
         }
         normalized += c;
@@ -98,7 +98,7 @@ handleGestureMessage(const std::string& message)
     {
         normalized = normalized.substr(8);
     }
-    //Serial(LogLevel::info) << normalized;
+    Serial(LogLevel::info) << normalized.size();
     //ControllerReference controller_reference = controller_->getControllerReference();
     bool gesture_command = true;
 
@@ -283,6 +283,7 @@ bestEffortTask()
      */
     if (planner_)
     {
+    
         planner_stage = planner_->plan();
     }
 
@@ -818,45 +819,45 @@ udpReadBipedMessageTask(void* pvParameters)
             
             continue;
         }
-
+        
         /*
          *  Declare deserialized Biped message struct, serialized message buffer,
          *  and the deserializer.
          */
-        BipedMessage message_deserialized;
-        std::vector<unsigned char> message_serialized(message.begin(), message.end());
-        zpp::serializer::memory_input_archive deserializer(message_serialized);
+        // BipedMessage message_deserialized;
+        // std::vector<unsigned char> message_serialized(message.begin(), message.end());
+        // zpp::serializer::memory_input_archive deserializer(message_serialized);
 
-        /*
-         *  Deserialize the serialized message buffer into the Biped message struct.
-         */
-        const auto result = deserializer(message_deserialized);
+        // /*
+        //  *  Deserialize the serialized message buffer into the Biped message struct.
+        //  */
+        // const auto result = deserializer(message_deserialized);
 
-        /*
-         *  Print warning message to serial and skip the current iteration upon
-         *  deserialization failure.
-         */
-        if (!result)
-        {
-            Serial(LogLevel::warn) << "Failed to deserialize Biped message.";
-            continue;
-        }
+        // /*
+        //  *  Print warning message to serial and skip the current iteration upon
+        //  *  deserialization failure.
+        //  */
+        // if (!result)
+        // {
+        //     Serial(LogLevel::warn) << "Failed to deserialize Biped message.";
+        //     continue;
+        // }
 
-        /*
-         *  If the controller global shared pointer is not a null pointer, using the controller
-         *  global shared pointer, set the controller parameter and controller reference structs
-         *  in the deserialized Biped message struct to the controller.
-         *
-         *  Refer to the controller header for the controller functions, the type header for Biped
-         *  message struct entries, and the global header for the global variables.
-         *
-         *  TODO LAB 5 YOUR CODE HERE.
-         */
-        if (controller_ != nullptr)
-        {
-            controller_->setControllerParameter(message_deserialized.controller_parameter);
-            controller_->setControllerReference(message_deserialized.controller_reference);
-        }
+        // /*
+        //  *  If the controller global shared pointer is not a null pointer, using the controller
+        //  *  global shared pointer, set the controller parameter and controller reference structs
+        //  *  in the deserialized Biped message struct to the controller.
+        //  *
+        //  *  Refer to the controller header for the controller functions, the type header for Biped
+        //  *  message struct entries, and the global header for the global variables.
+        //  *
+        //  *  TODO LAB 5 YOUR CODE HERE.
+        //  */
+        // if (controller_ != nullptr)
+        // {
+        //     controller_->setControllerParameter(message_deserialized.controller_parameter);
+        //     controller_->setControllerReference(message_deserialized.controller_reference);
+        // }
     }
 
     /*

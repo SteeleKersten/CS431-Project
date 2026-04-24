@@ -36,7 +36,7 @@ ManeuverPlanner::ManeuverPlanner() : maneuver_counter_(1), maneuver_timer_(0), p
      *  In the following configurations, the maneuvers should
      *  be chained up in a linked list fashion.
      */
-
+    last_gesture_recognized = 0;
     maneuver_thumbsup_ = std::make_shared<Maneuver>();
     maneuver_peace_ = std::make_shared<Maneuver>();
     maneuver_leftpointing_ = std::make_shared<Maneuver>();
@@ -60,7 +60,7 @@ ManeuverPlanner::ManeuverPlanner() : maneuver_counter_(1), maneuver_timer_(0), p
 
     maneuver_rightpointing_->transition_type = Maneuver::TransitionType::gesture_changed;
     maneuver_rightpointing_->transition_value = 0;
-    maneuver_rightpointing_->type = Maneuver::Type::drive_left;
+    maneuver_rightpointing_->type = Maneuver::Type::drive_right;
     maneuver_rightpointing_->next = nullptr;
 
     park_->transition_type = Maneuver::TransitionType::gesture_changed;
@@ -519,6 +519,7 @@ ManeuverPlanner::plan()
             }
             case Maneuver::TransitionType::gesture_changed:
             {
+                //printf("%u\n", gesture_recognized_);
                 if (gesture_recognized_ != last_gesture_recognized) {
                     switch (gesture_recognized_) {
                         case 1:
@@ -559,6 +560,7 @@ ManeuverPlanner::plan()
                     }
                 }
                 last_gesture_recognized = gesture_recognized_;
+                break;
             }
             default:
             {

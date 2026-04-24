@@ -102,7 +102,7 @@ private:
     std::shared_ptr<Maneuver> maneuver_rightpointing_;
     std::shared_ptr<Maneuver> park_;
 
-    unsigned int last_gesture_recognized = 0;
+    unsigned int last_gesture_recognized;
     int maneuver_counter_;  //!< Maneuver counter.
     unsigned long maneuver_timer_;  //!< Maneuver timer, in milliseconds.
     volatile bool plan_started_;    //!< Plan started flag.
