@@ -346,6 +346,8 @@ struct Maneuver
         reverse,    //!< Reverse until the end of this maneuver.
         reverse_left,   //!< Reverse to the left until the end of this maneuver.
         reverse_right,  //!< Reverse to the right until the end of this maneuver.
+        spin_cw,    //!< Spin in place clockwise until the end of this manuever.
+        spin_ccw,    //!< Spin in place counterclockwise until the end of this manuever.
     };
 
     /**
