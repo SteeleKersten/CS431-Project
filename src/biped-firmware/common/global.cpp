@@ -68,5 +68,7 @@ unsigned int gesture_recognized_ = 0;
  *  Initialize Biped serial number to 0.
  */
 unsigned serial_number_ = 0;
+bool stop_planner = false;
+
 }   // namespace firmware
 }   // namespace biped

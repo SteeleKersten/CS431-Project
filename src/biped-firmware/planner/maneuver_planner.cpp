@@ -42,6 +42,9 @@ ManeuverPlanner::ManeuverPlanner() : maneuver_counter_(1), maneuver_timer_(0), p
     maneuver_leftpointing_ = std::make_shared<Maneuver>();
     maneuver_rightpointing_ = std::make_shared<Maneuver>();
     park_ = std::make_shared<Maneuver>();
+    
+    std::shared_ptr<Maneuver> maneuver_leftpointing_2 = std::make_shared<Maneuver>();
+    std::shared_ptr<Maneuver> maneuver_rightpointing_2 = std::make_shared<Maneuver>();
 
     maneuver_thumbsup_->transition_type = Maneuver::TransitionType::gesture_changed;
     maneuver_thumbsup_->transition_value = 0;
@@ -53,15 +56,25 @@ ManeuverPlanner::ManeuverPlanner() : maneuver_counter_(1), maneuver_timer_(0), p
     maneuver_peace_->type = Maneuver::Type::reverse;
     maneuver_peace_->next = nullptr;
 
-    maneuver_leftpointing_->transition_type = Maneuver::TransitionType::gesture_changed;
-    maneuver_leftpointing_->transition_value = 0;
+    maneuver_leftpointing_->transition_type = Maneuver::TransitionType::duration;
+    maneuver_leftpointing_->transition_value = 0.2;
     maneuver_leftpointing_->type = Maneuver::Type::drive_left;
-    maneuver_leftpointing_->next = nullptr;
+    maneuver_leftpointing_->next = maneuver_leftpointing_2;
 
-    maneuver_rightpointing_->transition_type = Maneuver::TransitionType::gesture_changed;
-    maneuver_rightpointing_->transition_value = 0;
+    maneuver_leftpointing_2->transition_type = Maneuver::TransitionType::gesture_changed;
+    maneuver_leftpointing_2->transition_value = 0;
+    maneuver_leftpointing_2->type = Maneuver::Type::reverse_right;
+    maneuver_leftpointing_2->next = nullptr;
+
+    maneuver_rightpointing_->transition_type = Maneuver::TransitionType::duration;
+    maneuver_rightpointing_->transition_value = 0.2;
     maneuver_rightpointing_->type = Maneuver::Type::drive_right;
-    maneuver_rightpointing_->next = nullptr;
+    maneuver_rightpointing_->next = maneuver_rightpointing_2;
+
+    maneuver_rightpointing_2->transition_type = Maneuver::TransitionType::gesture_changed;
+    maneuver_rightpointing_2->transition_value = 0;
+    maneuver_rightpointing_2->type = Maneuver::Type::reverse_left;
+    maneuver_rightpointing_2->next = nullptr;
 
     park_->transition_type = Maneuver::TransitionType::gesture_changed;
     park_->transition_value = 0;
@@ -230,7 +243,7 @@ ManeuverPlanner::plan()
     /*
      *  Detect plan completion.
      */
-    if (plan_started_ && !plan_completed_ && !maneuver_)
+    if ((plan_started_ && !plan_completed_ && !maneuver_) || stop_planner)
     {
         Serial(LogLevel::info) << "Completed maneuver-based plan.";
 
@@ -244,6 +257,7 @@ ManeuverPlanner::plan()
          */
         plan_started_ = 0;
         plan_completed_ = 1;
+        stop_planner = false;
         return -1;
     }
 
@@ -631,6 +645,7 @@ ManeuverPlanner::generateControllerReference() const
              */
             controller_reference = controller_->getControllerReference();
             controller_reference.position_x = sensor_->getEncoderData().position_x - 1000;
+            controller_reference.attitude_z = degreesToRadians(0);
             controller_->setControllerReference(controller_reference);
 
             break;
@@ -654,8 +669,8 @@ ManeuverPlanner::generateControllerReference() const
              *  TODO LAB 8 YOUR CODE HERE.
              */
             controller_reference = controller_->getControllerReference();
-            controller_reference.position_x = sensor_->getEncoderData().position_x - 1000;
-            controller_reference.attitude_z -= degreesToRadians(90); //unsure
+            controller_reference.position_x = sensor_->getEncoderData().position_x - 500;
+            controller_reference.attitude_z = degreesToRadians(180); //unsure
             controller_->setControllerReference(controller_reference);
 
             break;
@@ -679,8 +694,8 @@ ManeuverPlanner::generateControllerReference() const
              *  TODO LAB 8 YOUR CODE HERE.
              */
             controller_reference = controller_->getControllerReference();
-            controller_reference.position_x = sensor_->getEncoderData().position_x - 1000;
-            controller_reference.attitude_z += degreesToRadians(90); //unsure
+            controller_reference.position_x = sensor_->getEncoderData().position_x - 500;
+            controller_reference.attitude_z = degreesToRadians(-180); //unsure
             controller_->setControllerReference(controller_reference);
 
             break;
@@ -697,6 +712,7 @@ ManeuverPlanner::generateControllerReference() const
              */
             controller_reference = controller_->getControllerReference();
             controller_reference.position_x = sensor_->getEncoderData().position_x + 1000;
+            controller_reference.attitude_z = degreesToRadians(0);
             controller_->setControllerReference(controller_reference);
 
             break;
@@ -716,10 +732,9 @@ ManeuverPlanner::generateControllerReference() const
              *  TODO LAB 8 YOUR CODE HERE.
              */
             controller_reference = controller_->getControllerReference();
-            controller_reference.position_x = sensor_->getEncoderData().position_x + 1000;
+            controller_reference.position_x = sensor_->getEncoderData().position_x + 500;
             controller_reference.attitude_z = degreesToRadians(-180);
             controller_->setControllerReference(controller_reference);
-
 
             break;
         }
@@ -738,7 +753,7 @@ ManeuverPlanner::generateControllerReference() const
              *  TODO LAB 8 YOUR CODE HERE.
              */
             controller_reference = controller_->getControllerReference();
-            controller_reference.position_x = sensor_->getEncoderData().position_x + 1000;
+            controller_reference.position_x = sensor_->getEncoderData().position_x + 500;
             controller_reference.attitude_z = degreesToRadians(180);
             controller_->setControllerReference(controller_reference);
             break;

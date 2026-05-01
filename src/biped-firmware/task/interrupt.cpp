@@ -322,6 +322,7 @@ pushButtonAInterruptHandler(void* arg)
 void IRAM_ATTR
 pushButtonBInterruptHandler(void* arg)
 {
+    stop_planner = true;
 }
 
 void IRAM_ATTR

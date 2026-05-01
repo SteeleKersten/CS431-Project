@@ -58,7 +58,7 @@ def classify_gesture(hand_landmarks, handedness_label):
     ring_is_up = finger_up(lm, mp_hands.HandLandmark.RING_FINGER_TIP, mp_hands.HandLandmark.RING_FINGER_PIP)
     pinky_is_up = finger_up(lm, mp_hands.HandLandmark.PINKY_TIP, mp_hands.HandLandmark.PINKY_PIP)
     thumb_is_up = thumb_up(lm, handedness_label)
-
+    #print(lm[mp_hands.HandLandmark.INDEX_FINGER_TIP].x)
     up_count = sum([thumb_is_up, index_is_up, middle_is_up, ring_is_up, pinky_is_up])
 
     if up_count == 0:
@@ -95,14 +95,20 @@ COMMAND_INTERVAL_SECONDS = 2
 NO_HAND_STOP_SECONDS = 0.5
 
 
-def gesture_to_command(handedness_label, gesture):
-    if gesture == "Thumbs Up":
+def gesture_to_command(handedness_label, gesture, lm):
+    if gesture == "Open Palm":
         return "forward"
     if gesture == "Peace":
         return "backward"
     if gesture == "Pointing":
-        return "right" if handedness_label == "Right" else "left"
-    if gesture in ("Open Palm", "Fist"):
+        # return "right" if handedness_label == "Right" else "left"
+        if lm[mp_hands.HandLandmark.INDEX_FINGER_TIP].x < 0.4:
+            return "right"
+        elif lm[mp_hands.HandLandmark.INDEX_FINGER_TIP].x > 0.6:
+            return "left"
+        else:
+            return "stop"
+    if gesture == "Fist":
         return "stop"
     return "no hand"
 
@@ -170,7 +176,7 @@ if run_stream:
                                 gesture = classify_gesture(hand_landmarks, handedness_label)
                                 detected_labels.append(f"{handedness_label}: {gesture}")
                                 if command_to_send is None:
-                                    gesture_to_send = gesture_to_command(handedness_label, gesture)
+                                    gesture_to_send = gesture_to_command(handedness_label, gesture, hand_landmarks.landmark)
                                     if gesture_to_send is not None:
                                         command_to_send = "gesture:" + gesture_to_send
 
@@ -211,7 +217,7 @@ if run_stream:
                             command_to_send != last_command
                             or current_time - last_command_time >= COMMAND_INTERVAL_SECONDS
                         ):
-                            print(f"sending: {command_to_send}")
+                            #print(f"sending: {command_to_send}")
                             command_sock.sendto(command_to_send.encode('utf-8'), (ESP32_IP, COMMAND_PORT))
                             last_command = command_to_send
                             last_command_time = current_time

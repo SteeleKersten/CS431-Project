@@ -80,6 +80,7 @@ extern unsigned long interval_real_time_task_;  //!< Real-time task interval, in
 extern double timer_domain_;    //!< Period domain timer, in seconds.
 extern unsigned int gesture_recognized_;
 extern unsigned serial_number_; //!< Biped serial number.
+extern bool stop_planner;
 }   // namespace firmware
 }   // namespace biped
 
