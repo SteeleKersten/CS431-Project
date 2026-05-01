@@ -102,13 +102,14 @@ struct ControllerReference
     double attitude_y;   //!< Y attitude (pitch) controller reference, in radians.
     double attitude_z;   //!< Z attitude (yaw) controller reference, in radians.
     double position_x;   //!< X position controller reference, in meters.
+    double spin;		 //!< Whether robot spins, pos is CW neg is CCW
 
     /**
      *  @brief  Controller reference struct constructor.
      *
      *  This constructor initializes all controller reference struct entries to 0.
      */
-    ControllerReference() : attitude_y(0), attitude_z(0), position_x(0)
+    ControllerReference() : attitude_y(0), attitude_z(0), position_x(0), spin(0)
     {
     }
 
