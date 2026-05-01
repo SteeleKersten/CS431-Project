@@ -540,8 +540,15 @@ Controller::control(const bool& fast_domain)
          *
          *  TODO LAB 7 YOUR CODE HERE.
          */
-        output_attitude_z_ = open_loop_controller_attitude_z_.control() * abs(enc_data.velocity_x)
-                + pid_controller_attitude_z_.control();
+        if(controller_reference_.spin != 0)
+        {
+        	pid_controller_position_x_.setReference(enc_data.position_x);
+        	output_attitude_z_ = controller_reference_.spin;
+        }
+        else
+        {
+		output_attitude_z_ = open_loop_controller_attitude_z_.control() * abs(enc_data.velocity_x) + pid_controller_attitude_z_.control();
+        }
     }
 
     /*
