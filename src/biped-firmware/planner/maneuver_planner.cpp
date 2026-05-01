@@ -42,9 +42,6 @@ ManeuverPlanner::ManeuverPlanner() : maneuver_counter_(1), maneuver_timer_(0), p
     maneuver_leftpointing_ = std::make_shared<Maneuver>();
     maneuver_rightpointing_ = std::make_shared<Maneuver>();
     park_ = std::make_shared<Maneuver>();
-    
-    std::shared_ptr<Maneuver> maneuver_leftpointing_2 = std::make_shared<Maneuver>();
-    std::shared_ptr<Maneuver> maneuver_rightpointing_2 = std::make_shared<Maneuver>();
 
     maneuver_thumbsup_->transition_type = Maneuver::TransitionType::gesture_changed;
     maneuver_thumbsup_->transition_value = 0;
@@ -56,25 +53,15 @@ ManeuverPlanner::ManeuverPlanner() : maneuver_counter_(1), maneuver_timer_(0), p
     maneuver_peace_->type = Maneuver::Type::reverse;
     maneuver_peace_->next = nullptr;
 
-    maneuver_leftpointing_->transition_type = Maneuver::TransitionType::duration;
-    maneuver_leftpointing_->transition_value = 0.2;
-    maneuver_leftpointing_->type = Maneuver::Type::drive_left;
-    maneuver_leftpointing_->next = maneuver_leftpointing_2;
+    maneuver_leftpointing_->transition_type = Maneuver::TransitionType::gesture_changed;
+    maneuver_leftpointing_->transition_value = 0;
+    maneuver_leftpointing_->type = Maneuver::Type::spin_ccw;
+    maneuver_leftpointing_->next = nullptr;
 
-    maneuver_leftpointing_2->transition_type = Maneuver::TransitionType::gesture_changed;
-    maneuver_leftpointing_2->transition_value = 0;
-    maneuver_leftpointing_2->type = Maneuver::Type::reverse_right;
-    maneuver_leftpointing_2->next = nullptr;
-
-    maneuver_rightpointing_->transition_type = Maneuver::TransitionType::duration;
-    maneuver_rightpointing_->transition_value = 0.2;
-    maneuver_rightpointing_->type = Maneuver::Type::drive_right;
-    maneuver_rightpointing_->next = maneuver_rightpointing_2;
-
-    maneuver_rightpointing_2->transition_type = Maneuver::TransitionType::gesture_changed;
-    maneuver_rightpointing_2->transition_value = 0;
-    maneuver_rightpointing_2->type = Maneuver::Type::reverse_left;
-    maneuver_rightpointing_2->next = nullptr;
+    maneuver_rightpointing_->transition_type = Maneuver::TransitionType::gesture_changed;
+    maneuver_rightpointing_->transition_value = 0;
+    maneuver_rightpointing_->type = Maneuver::Type::spin_cw;
+    maneuver_rightpointing_->next = nullptr;
 
     park_->transition_type = Maneuver::TransitionType::gesture_changed;
     park_->transition_value = 0;
@@ -756,6 +743,22 @@ ManeuverPlanner::generateControllerReference() const
             controller_reference.position_x = sensor_->getEncoderData().position_x + 500;
             controller_reference.attitude_z = degreesToRadians(180);
             controller_->setControllerReference(controller_reference);
+            break;
+        }
+        case Maneuver::Type::spin_cw:
+        {
+        	//obtain encoder data, set position in place, set spin value
+            EncoderData enc_data = sensor_->getEncoderData();
+            controller_reference.position_x = enc_data.position_x;
+            controller_reference.spin = 50;
+            break;
+        }
+        case Maneuver::Type::spin_ccw:
+        {
+        	//obtain encoder data, set position in place, set spin value
+            EncoderData enc_data = sensor_->getEncoderData();
+            controller_reference.position_x = enc_data.position_x;
+            controller_reference.spin = -50;
             break;
         }
         default:
