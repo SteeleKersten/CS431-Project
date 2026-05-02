@@ -616,8 +616,8 @@ ManeuverPlanner::generateControllerReference() const
              */
             controller_reference = controller_->getControllerReference();
             controller_reference.position_x = sensor_->getEncoderData().position_x;
+            controller_reference.spin = 0;
             controller_->setControllerReference(controller_reference);
-
             break;
         }
         case Maneuver::Type::reverse:
@@ -633,6 +633,7 @@ ManeuverPlanner::generateControllerReference() const
             controller_reference = controller_->getControllerReference();
             controller_reference.position_x = sensor_->getEncoderData().position_x - 1000;
             controller_reference.attitude_z = degreesToRadians(0);
+            controller_reference.spin = 0;
             controller_->setControllerReference(controller_reference);
 
             break;
@@ -658,6 +659,7 @@ ManeuverPlanner::generateControllerReference() const
             controller_reference = controller_->getControllerReference();
             controller_reference.position_x = sensor_->getEncoderData().position_x - 500;
             controller_reference.attitude_z = degreesToRadians(180); //unsure
+            controller_reference.spin = 0;
             controller_->setControllerReference(controller_reference);
 
             break;
@@ -683,6 +685,7 @@ ManeuverPlanner::generateControllerReference() const
             controller_reference = controller_->getControllerReference();
             controller_reference.position_x = sensor_->getEncoderData().position_x - 500;
             controller_reference.attitude_z = degreesToRadians(-180); //unsure
+            controller_reference.spin = 0;
             controller_->setControllerReference(controller_reference);
 
             break;
@@ -700,6 +703,7 @@ ManeuverPlanner::generateControllerReference() const
             controller_reference = controller_->getControllerReference();
             controller_reference.position_x = sensor_->getEncoderData().position_x + 1000;
             controller_reference.attitude_z = degreesToRadians(0);
+            controller_reference.spin = 0;
             controller_->setControllerReference(controller_reference);
 
             break;
@@ -721,6 +725,7 @@ ManeuverPlanner::generateControllerReference() const
             controller_reference = controller_->getControllerReference();
             controller_reference.position_x = sensor_->getEncoderData().position_x + 500;
             controller_reference.attitude_z = degreesToRadians(-180);
+            controller_reference.spin = 0;
             controller_->setControllerReference(controller_reference);
 
             break;
@@ -742,6 +747,7 @@ ManeuverPlanner::generateControllerReference() const
             controller_reference = controller_->getControllerReference();
             controller_reference.position_x = sensor_->getEncoderData().position_x + 500;
             controller_reference.attitude_z = degreesToRadians(180);
+            controller_reference.spin = 0;
             controller_->setControllerReference(controller_reference);
             break;
         }
@@ -751,6 +757,7 @@ ManeuverPlanner::generateControllerReference() const
             EncoderData enc_data = sensor_->getEncoderData();
             controller_reference.position_x = enc_data.position_x;
             controller_reference.spin = 50;
+            controller_->setControllerReference(controller_reference);
             break;
         }
         case Maneuver::Type::spin_ccw:
@@ -759,6 +766,7 @@ ManeuverPlanner::generateControllerReference() const
             EncoderData enc_data = sensor_->getEncoderData();
             controller_reference.position_x = enc_data.position_x;
             controller_reference.spin = -50;
+            controller_->setControllerReference(controller_reference);
             break;
         }
         default:
